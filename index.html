@@ -1,1 +1,324 @@
-g
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emotion Trainer – Mode 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 700px;
+      width: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* WATERMARK */
+    .watermark {
+      position: absolute;
+      inset: 0;
+      background: rgba(2,6,23,0.65);
+      backdrop-filter: blur(2px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: #eab308;
+      z-index: 999;
+      pointer-events: none;
+      animation: fadeOut 5s forwards;
+    }
+
+    @keyframes fadeOut {
+      0%   { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin: 0 0 10px;
+      text-align: center;
+      color: #f9fafb;
+    }
+
+    .mode-label {
+      text-align: center;
+      font-size: .9rem;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    .word-display {
+      border-radius: 18px;
+      padding: 24px 18px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      text-align: center;
+      cursor: pointer;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .emoji { font-size: 3rem; margin-bottom: 4px; min-height: 3rem; }
+    .word-text {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status {
+      display:flex;
+      justify-content:space-between;
+      margin-top:10px;
+      color:#9ca3af;
+    }
+
+    .group-label { font-weight:600; }
+
+    .timer-row {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:8px;
+      color:#9ca3af;
+      font-size:.85rem;
+    }
+
+    .countdown { min-width:60px; }
+
+    .progress-container {
+      flex:1;
+      background:#111827;
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid #1f2937;
+    }
+
+    .progress-bar {
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #22c55e, #eab308);
+    }
+
+    .controls-row {
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+    }
+
+    button {
+      border:none;
+      border-radius:999px;
+      padding:8px 14px;
+      background:#4b5563;
+      color:#e5e7eb;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    .nav-row {
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+    }
+
+    .btn-nav {
+      background:#111827;
+      flex:1;
+    }
+
+    .settings {
+      margin-top:16px;
+      border-radius:14px;
+      padding:12px;
+      background:#020617;
+      border:1px solid #1f2937;
+      font-size:.85rem;
+    }
+
+    .settings-row {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:6px;
+    }
+
+    input[type="number"]{
+      width:70px;
+      text-align:center;
+      border-radius:999px;
+      border:1px solid #4b5563;
+      background:#020617;
+      color:#e5e7eb;
+      padding:4px 6px;
+    }
+
+    input:focus {
+      outline:none;
+      border-color:#eab308;
+    }
+
+    .hint {
+      font-size:.78rem;
+      color:#6b7280;
+      margin-top:4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- WATERMARK -->
+  <div class="watermark">
+    Jimmy James – 07.12.2025 – v1
+  </div>
+
+  <h1>Emotion Word Trainer</h1>
+  <div class="mode-label">Mode 1 · Tap the big card for a new word</div>
+
+  <div id="wordArea" class="word-display">
+    <div id="emoji" class="emoji"></div>
+    <div id="wordText" class="word-text">…</div>
+  </div>
+
+  <div class="status">
+    <span id="groupLabel" class="group-label"></span>
+    <span id="categoryLabel"></span>
+  </div>
+
+  <div class="timer-row">
+    <span id="countdown" class="countdown"></span>
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <button id="revealBtn">Reveal hierarchy</button>
+  </div>
+
+  <div class="nav-row">
+    <button id="prevBtn" class="btn-nav">◀ Prev</button>
+    <button id="nextBtn" class="btn-nav">Next ▶</button>
+  </div>
+
+  <div class="settings">
+    <div class="settings-row">
+      <label>
+        Seconds / word:
+        <input id="intervalInput" type="number" min="3" step="1" value="10">
+      </label>
+      <label>
+        <input id="speakToggle" type="checkbox">
+        Speak word aloud
+      </label>
+    </div>
+
+    <div class="settings-row">
+      <label>
+        <input id="countdownToggle" type="checkbox" checked>
+        Show countdown
+      </label>
+      <label>
+        <input id="barToggle" type="checkbox" checked>
+        Show progress bar
+      </label>
+    </div>
+
+    <div class="hint">
+      First second = first part · Second = first + second · Third = full word.  
+      Emoji appears randomly ~80% of the time.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- SIMPLE CORE LOGIC -----
+const words = ["Joyful","Curious","Jealous","Detached","Lonely","Worried","Inspired"];
+let index = 0;
+let parts = [];
+let timer = null;
+
+const emojiEl = document.getElementById("emoji");
+const wordText = document.getElementById("wordText");
+const countdown = document.getElementById("countdown");
+const progressBar = document.getElementById("progressBar");
+const intervalInput = document.getElementById("intervalInput");
+
+function split3(word){
+  const len=word.length;
+  return [
+    word.slice(0, Math.floor(len/3)),
+    word.slice(Math.floor(len/3), Math.floor(len*2/3)),
+    word.slice(Math.floor(len*2/3))
+  ];
+}
+
+function newWord(){
+  const w = words[index];
+  index=(index+1)%words.length;
+  parts=split3(w);
+
+  emojiEl.textContent = Math.random()<0.8 ? "😊" : "";
+
+  let seconds = parseFloat(intervalInput.value)||10;
+  let start = Date.now();
+
+  if(timer) clearInterval(timer);
+
+  timer = setInterval(()=>{
+    let t=(Date.now()-start)/1000;
+    
+    if(t<1) wordText.textContent=parts[0];
+    else if(t<2) wordText.textContent=parts[0]+parts[1];
+    else wordText.textContent=w;
+
+    countdown.textContent=(seconds - t).toFixed(1)+" s";
+    progressBar.style.width=`${Math.min((t/seconds)*100,100)}%`;
+
+    if(t>=seconds){
+      newWord();
+    }
+
+  }, 100);
+}
+
+document.getElementById("wordArea").onclick=newWord;
+document.getElementById("nextBtn").onclick=newWord;
+
+document.getElementById("prevBtn").onclick=()=>{
+  index=(index-2+words.length)%words.length;
+  newWord();
+};
+
+newWord();
+</script>
+
+</body>
+</html>
+
