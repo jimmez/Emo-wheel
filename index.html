@@ -1,9 +1,9 @@
-<!-- Emotional Generator v07 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v08 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator â€“ Mode 1</title>
+  <title>Emotional Generator v08 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -357,11 +357,11 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James â€“ 07.12.2025 â€“ v07
+      Jimmy James â€“ 07.12.2025 â€“ v08
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator</h1>
+      <h1>Emotional Generator v08</h1>
       <div class="mode-label">Mode 1 Â· Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
@@ -455,18 +455,11 @@
         </div>
 
         <div class="hint">
-          <strong>Status v07 (Emotional Generator):</strong><br>
-          âœ… Emoji rendering fixed on Android<br>
-          âœ… Emoji toggle OFF by default<br>
-          âœ… Prev / Pause / Next buttons readable everywhere<br>
-          âœ… Random words default + setting to deselect random<br>
-          âœ… Gen Z words lowercase + italic + top display<br>
-          âœ… Gen Z overflow issue fixed<br>
-          âœ… Phonetic mode button works<br>
-          âœ… Syllable-per-line mode behaves as specified<br>
-          âœ… Progress bar leftâ†’right<br>
-          âœ… Android screen split bug eliminated<br>
-          âœ… No copy/paste needed â€” file downloads directly
+          â€¢ First second: first syllable + underscores (in normal mode).<br>
+          â€¢ Second: first + second syllable + underscores.<br>
+          â€¢ In syllable-line mode: each syllable gets its own line (no underscores).<br>
+          â€¢ Phonetic mode uses syllables that feel like speech, not spelling.<br>
+          â€¢ Gen Z mode: shows slang first, then the original word at the end.
         </div>
       </div>
     </div>
@@ -1132,7 +1125,7 @@
       const genZMode = genZToggle.checked;
       if (genZMode) {
         const slang = getGenZWord(entry.displayWord);
-        currentSlangWord = slang ? slang.toLowerCase() : "";
+        currentSlangWord = (slang || "").toLowerCase();
       } else {
         currentSlangWord = "";
       }
