@@ -1,9 +1,9 @@
-<!-- Emotional Generator v08 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v05 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v08 â€“ Mode 1</title>
+  <title>Emotional Generator â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -110,15 +110,6 @@
       margin-bottom: 4px;
       min-height: 2.4rem;
       text-align: left;
-      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif;
-    }
-
-    .genz-top {
-      font-style: italic;
-      text-transform: none;
-      color: #22c55e;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
     }
 
     .word-text {
@@ -357,16 +348,15 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James â€“ 07.12.2025 â€“ v08
+      Jimmy James â€“ 07.12.2025 â€“ v05
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v08</h1>
+      <h1>Emotional Generator</h1>
       <div class="mode-label">Mode 1 Â· Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
         <div id="wordArea" class="word-display">
-          <div id="genZTop" class="genz-top"></div>
           <div id="emoji" class="emoji"></div>
           <div id="wordText" class="word-text">â€¦</div>
         </div>
@@ -392,9 +382,9 @@
         <div id="revealPanel" class="reveal-panel"></div>
 
         <div class="nav-row">
-          <button id="prevBtn" class="nav-btn">Prev</button>
-          <button id="pauseBtn" class="nav-btn">Pause</button>
-          <button id="nextBtn" class="nav-btn">Next</button>
+          <button id="prevBtn" class="nav-btn">â—€ Prev</button>
+          <button id="pauseBtn" class="nav-btn">Pause â¸</button>
+          <button id="nextBtn" class="nav-btn">Next â–¶</button>
         </div>
       </div>
     </div>
@@ -739,7 +729,6 @@
 
     const wordTouchZone = document.getElementById("wordTouchZone");
     const emojiEl = document.getElementById("emoji");
-    const genZTopEl = document.getElementById("genZTop");
     const wordTextEl = document.getElementById("wordText");
     const groupLabelEl = document.getElementById("groupLabel");
     const categoryLabelEl = document.getElementById("categoryLabel");
@@ -775,7 +764,6 @@
     let currentEntry = ALL_WORDS[0];
     let currentParts = [];
     let currentBaseWord = "";
-    let currentSlangWord = "";
     let showEmojiForWord = true;
     let phoneticMode = false;
 
@@ -883,7 +871,7 @@
     }
 
     function updatePauseButton() {
-      pauseBtn.textContent = isPaused ? "Play â–¶" : "Pause";
+      pauseBtn.textContent = isPaused ? "Play â–¶" : "Pause â¸";
     }
 
     function renderStaticInfo() {
@@ -989,6 +977,9 @@
       const parts = currentParts;
       const totalParts = parts.length;
       const multi = syllableModeToggle.checked;
+      const genZMode = genZToggle.checked;
+      const original = currentEntry.displayWord;
+      const base = currentBaseWord;
 
       let textLines = [];
       let emojiForLine = null;
@@ -1005,6 +996,9 @@
         if (stage >= 3) count = totalParts;
         textLines = parts.slice(0, count);
 
+        if (stage >= 3 && genZMode && base !== original) {
+          textLines.push(original);
+        }
         if (stage >= 3 && emojiForLine) {
           textLines.push(emojiForLine);
         }
@@ -1026,6 +1020,9 @@
           displayText = visible + (remaining.length > 0 ? "_".repeat(remaining.length) : "");
         } else {
           displayText = parts.join("");
+          if (genZMode && base !== original) {
+            displayText += "  â†’  " + original;
+          }
         }
         wordTextEl.textContent = displayText;
         emojiEl.textContent = emojiForLine || "";
@@ -1123,18 +1120,12 @@
     function applyWord(entry) {
       currentEntry = entry;
       const genZMode = genZToggle.checked;
-      if (genZMode) {
-        const slang = getGenZWord(entry.displayWord);
-        currentSlangWord = (slang || "").toLowerCase();
-      } else {
-        currentSlangWord = "";
-      }
-      currentBaseWord = entry.displayWord;
-      currentParts = getSyllableParts(currentBaseWord, phoneticMode);
+      const baseWord = genZMode ? getGenZWord(entry.displayWord) : entry.displayWord;
+      currentBaseWord = baseWord;
+      currentParts = getSyllableParts(baseWord, phoneticMode);
       showEmojiForWord = Math.random() < EMOJI_PROBABILITY;
       renderStaticInfo();
       renderHierarchy();
-      updateGenZTop();
       resetTimers();
     }
 
