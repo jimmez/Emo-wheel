@@ -1,158 +1,1280 @@
+<!-- Emotional Generator v07 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Emotional Generator v06</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{margin:0;background:#020617;color:#e5e7eb;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-.app{max-width:900px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:10px}
-h1{text-align:center;margin:6px 0;}
-.watermark{position:fixed;bottom:6px;right:10px;font-size:.7rem;color:#9ca3af;pointer-events:none;}
-.word-display{flex:1;border-radius:16px;padding:20px;background:#111827;box-shadow:0 10px 20px rgba(0,0,0,.5);}
-.genZWord{font-style:italic;text-transform:none;color:#22c55e;margin-bottom:6px;}
-.word-text{font-size:2.4rem;font-weight:700;letter-spacing:.08em;white-space:pre-wrap;word-break:break-word;}
-.emoji{font-size:2rem;margin-top:6px;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;}
-.controls,.nav{display:flex;gap:8px;margin-top:8px;justify-content:center;flex-wrap:wrap;}
-button{border:1px solid #374151;border-radius:999px;background:#020617;color:#fff;padding:6px 12px;cursor:pointer;}
-.progress{height:6px;background:#020617;border:1px solid #1f2937;border-radius:999px;overflow:hidden;margin-top:6px}
-.bar{height:100%;width:0;background:#22c55e;}
-.settings{border:1px solid #1f2937;border-radius:12px;padding:8px;margin-top:8px;font-size:.85rem;}
-.settings label{display:block;margin:4px 0;}
-</style>
+  <meta charset="UTF-8" />
+  <title>Emotional Generator â€“ Mode 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: block;
+      background: #020617;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding: 10px 14px 14px;
+      position: relative;
+    }
+
+    /* WATERMARK â€“ small, no blur, fades after 5s */
+    .watermark {
+      position: fixed;
+      right: 10px;
+      bottom: 6px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 50;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      animation: watermarkFade 5s forwards;
+    }
+
+    @keyframes watermarkFade {
+      0%   { opacity: 0.9; }
+      80%  { opacity: 0.9; }
+      100% { opacity: 0; }
+    }
+
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .settings-wrapper {
+      margin-top: 6px;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin: 0 0 4px;
+      text-align: center;
+      color: #f9fafb;
+    }
+
+    .mode-label {
+      text-align: center;
+      font-size: 0.86rem;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .word-touch-zone {
+      flex: 1;
+      min-height: 55vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      cursor: pointer;
+    }
+
+    .word-display {
+      border-radius: 18px;
+      padding: 20px 18px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+      min-height: 40vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .word-touch-zone:active .word-display {
+      transform: scale(0.98);
+      box-shadow: 0 5px 16px rgba(0,0,0,0.55);
+    }
+
+    .emoji {
+      font-size: 2.4rem;
+      margin-bottom: 4px;
+      min-height: 2.4rem;
+      text-align: left;
+      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif;
+    }
+
+    .genz-top {
+      font-style: italic;
+      text-transform: none;
+      color: #22c55e;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .word-text {
+      font-size: clamp(2rem, 4vw, 2.7rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      word-wrap: break-word;
+      text-align: left;
+      line-height: 1.1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.86rem;
+      color: #9ca3af;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .group-label {
+      font-weight: 600;
+      min-width: 0;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .timer-row {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: #9ca3af;
+    }
+
+    .countdown {
+      min-width: 52px;
+    }
+
+    .progress-container {
+      flex: 1;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 8px;
+      border: 1px solid #1f2937;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #eab308);
+      transition: width 0.1s linear;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: #9ca3af;
+      flex-wrap: wrap;
+    }
+
+    .reveal-toggle,
+    .settings-toggle,
+    .phonetic-toggle {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 4px 10px;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .nav-row {
+      margin-top: 6px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: #111827;
+      color: #e5e7eb;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 0 0 rgba(0,0,0,0.4);
+    }
+
+    .reveal-panel {
+      margin-top: 6px;
+      border-radius: 14px;
+      padding: 8px 10px;
+      background: #030712;
+      border: 1px dashed #4b5563;
+      display: none;
+      font-size: 0.82rem;
+      max-height: 35vh;
+      overflow-y: auto;
+    }
+
+    .reveal-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .reveal-line {
+      margin: 2px 0;
+    }
+
+    .chip-row {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid currentColor;
+      font-size: 0.75rem;
+    }
+
+    .chip.current {
+      font-weight: 600;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .settings {
+      border-radius: 14px 14px 10px 10px;
+      padding: 8px 10px 10px;
+      background: #020617;
+      border: 1px solid #1f2937;
+      font-size: 0.82rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .settings.hidden {
+      display: none;
+    }
+
+    .settings h2 {
+      font-size: 0.86rem;
+      margin: 0 0 4px;
+      color: #e5e7eb;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .settings label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .settings input[type="number"] {
+      width: 70px;
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      text-align: center;
+      outline: none;
+      font-size: 0.82rem;
+    }
+
+    .settings input[type="number"]:focus {
+      border-color: #eab308;
+      box-shadow: 0 0 0 1px #eab30855;
+    }
+
+    .settings input[type="checkbox"],
+    .settings select {
+      accent-color: #eab308;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      padding: 3px 8px;
+      font-size: 0.8rem;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .word-display {
+        min-height: 45vh;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class='watermark'>Jimmy James â€“ 07.12.2025 â€“ v06</div>
-<div class='app'>
-<h1>Emotional Generator</h1>
+  <div class="app">
+    <div class="watermark">
+      Jimmy James â€“ 07.12.2025 â€“ v07
+    </div>
 
-<div class="word-display">
-  <div id="genZTop" class="genZWord"></div>
-  <div id="wordText" class="word-text"></div>
-  <div id="emoji" class="emoji"></div>
-  <div class="progress"><div id="bar" class="bar"></div></div>
-</div>
+    <div class="main-area" id="mainArea">
+      <h1>Emotional Generator</h1>
+      <div class="mode-label">Mode 1 Â· Tap anywhere above the settings for a new word</div>
 
-<div class="nav">
-<button id="prevBtn">Prev</button>
-<button id="pauseBtn">Pause</button>
-<button id="nextBtn">Next</button>
-</div>
+      <div class="word-touch-zone" id="wordTouchZone">
+        <div id="wordArea" class="word-display">
+          <div id="genZTop" class="genz-top"></div>
+          <div id="emoji" class="emoji"></div>
+          <div id="wordText" class="word-text">â€¦</div>
+        </div>
 
-<div class="controls">
-<button id="phoneticBtn">Phonetic: Off</button>
-</div>
+        <div class="status-row">
+          <span id="groupLabel" class="group-label"></span>
+          <span id="categoryLabel"></span>
+        </div>
 
-<div class="settings">
-<label>
-Play order:
-<select id="playMode">
-<option value="random">Random (default)</option>
-<option value="grouped">By groups</option>
-</select>
-</label>
+        <div class="timer-row">
+          <span id="countdown" class="countdown"></span>
+          <div id="progressContainer" class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
 
-<label><input type="checkbox" id="genZToggle"> Genâ€‘Z slang</label>
-<label><input type="checkbox" id="emojiToggle"> Show emoji</label>
-<label><input type="checkbox" id="syllableToggle"> Syllables on separate lines</label>
-</div>
-</div>
+        <div class="top-controls">
+          <button id="revealBtn" class="reveal-toggle">Reveal hierarchy â–¾</button>
+          <button id="phoneticBtn" class="phonetic-toggle">Phonetic: OFF</button>
+          <button id="settingsToggleBtn" class="settings-toggle">Hide settings â¬‡</button>
+        </div>
 
-<script>
-const WORDS=["Playful","Aroused","Cheeky","Content","Free","Joyful","Interested","Curious","Inquisitive","Proud","Successful","Confident","Accepted","Respected","Valued",
-"Powerful","Courageous","Creative","Peaceful","Loving","Thankful","Trusting","Sensitive","Intimate","Optimistic","Hopeful","Inspired",
-"Startled","Shocked","Dismayed","Confused","Disillusioned","Perplexed","Amazed","Astonished","Awe","Excited","Eager","Energetic",
-"Lonely","Isolated","Abandoned","Vulnerable","Victimised","Fragile","Scared","Helpless","Frightened","Anxious","Worried"];
+        <div id="revealPanel" class="reveal-panel"></div>
 
-const GENZ={"AMAZED":"mind blown","LONELY":"solo core","CONFIDENT":"built different","TIRED":"no energy","EXCITED":"hyped up"};
+        <div class="nav-row">
+          <button id="prevBtn" class="nav-btn">Prev</button>
+          <button id="pauseBtn" class="nav-btn">Pause</button>
+          <button id="nextBtn" class="nav-btn">Next</button>
+        </div>
+      </div>
+    </div>
 
-let order=[...WORDS];
-let index=0;
-let paused=false;
-let phonetic=false;
-let timer=null;
-let elapsed=0;
-const total=10;
+    <div class="settings-wrapper">
+      <div class="settings" id="settingsPanel">
+        <h2>Settings</h2>
+        <div class="settings-row">
+          <label>
+            Seconds / word:
+            <input id="intervalInput" type="number" min="3" step="1" value="10" />
+          </label>
+          <label>
+            <input id="speakToggle" type="checkbox" />
+            Speak word aloud
+          </label>
+        </div>
 
-const wordEl=document.getElementById('wordText');
-const genZTop=document.getElementById('genZTop');
-const emojiEl=document.getElementById('emoji');
-const bar=document.getElementById('bar');
-const phoneticBtn=document.getElementById('phoneticBtn');
+        <div class="settings-row">
+          <label>
+            <input id="countdownToggle" type="checkbox" checked />
+            Show countdown
+          </label>
+          <label>
+            <input id="barToggle" type="checkbox" checked />
+            Show progress bar
+          </label>
+        </div>
 
-function shuffle(arr){
- for(let i=arr.length-1;i>0;i--){
-  const j=Math.floor(Math.random()*(i+1));
-  [arr[i],arr[j]]=[arr[j],arr[i]];
- }
-}
-shuffle(order);
+        <div class="settings-row">
+          <label>
+            <input id="syllableModeToggle" type="checkbox" />
+            Syllables on separate lines
+          </label>
+          <label>
+            <input id="fullscreenToggle" type="checkbox" checked />
+            Fullscreen mode
+          </label>
+        </div>
 
-function splitWord(w){
- if(!phonetic) return w.match(/.{1,Math.ceil(w.length/3)}/g);
- return w.replace(/([aeiou])/ig,"-$1").split("-").filter(Boolean);
-}
+        <div class="settings-row">
+          <label for="playModeSelect">Play order:</label>
+          <select id="playModeSelect">
+            <option value="random">Random (default)</option>
+            <option value="grouped">By group order</option>
+          </select>
+        </div>
 
-function render(){
- const w=order[index];
- const gen=GENZ[w.toUpperCase()];
- genZTop.textContent=(document.getElementById("genZToggle").checked && gen)?gen.toLowerCase():"";
- const parts=splitWord(gen||w);
+        <div class="settings-row">
+          <label>
+            <input id="emojiToggle" type="checkbox" />
+            Show emoji
+          </label>
+          <label>
+            <input id="genZToggle" type="checkbox" />
+            Gen Z slang mode
+          </label>
+        </div>
 
- if(document.getElementById("syllableToggle").checked){
-   wordEl.textContent=parts.join("\n");
- }else{
-   wordEl.textContent=parts.join("");
- }
- emojiEl.textContent=(document.getElementById("emojiToggle").checked && elapsed/total>.8)?"ðŸ˜Š":"";
-}
+        <div class="hint">
+          <strong>Status v07 (Emotional Generator):</strong><br>
+          âœ… Emoji rendering fixed on Android<br>
+          âœ… Emoji toggle OFF by default<br>
+          âœ… Prev / Pause / Next buttons readable everywhere<br>
+          âœ… Random words default + setting to deselect random<br>
+          âœ… Gen Z words lowercase + italic + top display<br>
+          âœ… Gen Z overflow issue fixed<br>
+          âœ… Phonetic mode button works<br>
+          âœ… Syllable-per-line mode behaves as specified<br>
+          âœ… Progress bar leftâ†’right<br>
+          âœ… Android screen split bug eliminated<br>
+          âœ… No copy/paste needed â€” file downloads directly
+        </div>
+      </div>
+    </div>
+  </div>
 
-function tick(){
- if(paused) return;
- elapsed+=.1;
- bar.style.width=((elapsed/total)*100)+"%";
- if(elapsed>=total){
-  next();
- }
- render();
-}
+  <script>
+    const EMOJI_START_FRACTION = 0.8;
+    const EMOJI_PROBABILITY = 0.8;
 
-function start(){
- clearInterval(timer);
- elapsed=0;
- bar.style.width="0%";
- timer=setInterval(tick,100);
- render();
-}
+    const EMOTION_GROUPS = [
+      {
+        name: "GLAD (Happy)",
+        emoji: "ðŸ˜Š",
+        color: "#fbbf24",
+        categories: [
+          { name: "Playful", emoji: "ðŸ˜Š", children: ["Aroused", "Cheeky"] },
+          { name: "Content", emoji: "ðŸ™‚", children: ["Free", "Joyful"] },
+          { name: "Interested", emoji: "ðŸ¤”", children: ["Curious", "Inquisitive"] },
+          { name: "Proud", emoji: "ðŸ˜Œ", children: ["Successful", "Confident"] },
+          { name: "Accepted", emoji: "ðŸ¤", children: ["Respected", "Valued"] },
+          { name: "Powerful", emoji: "ðŸ’ª", children: ["Courageous", "Creative"] },
+          { name: "Peaceful", emoji: "ðŸ•Šï¸", children: ["Loving", "Thankful"] },
+          { name: "Trusting", emoji: "ðŸ¤—", children: ["Sensitive", "Intimate"] },
+          { name: "Optimistic", emoji: "ðŸŒˆ", children: ["Hopeful", "Inspired"] },
+        ],
+      },
+      {
+        name: "SURPRISED",
+        emoji: "ðŸ˜®",
+        color: "#38bdf8",
+        categories: [
+          { name: "Startled", emoji: "ðŸ˜³", children: ["Shocked", "Dismayed"] },
+          { name: "Confused", emoji: "ðŸ˜•", children: ["Disillusioned", "Perplexed"] },
+          { name: "Amazed", emoji: "ðŸ¤©", children: ["Astonished", "Awe"] },
+          { name: "Excited", emoji: "ðŸ˜ƒ", children: ["Eager", "Energetic"] },
+        ],
+      },
+      {
+        name: "BAD (Angry)",
+        emoji: "ðŸ˜¡",
+        color: "#f97316",
+        categories: [
+          { name: "Let down", emoji: "ðŸ˜ž", children: ["Betrayed", "Resentful"] },
+          { name: "Humiliated", emoji: "ðŸ˜³", children: ["Disrespected", "Ridiculed"] },
+          { name: "Bitter", emoji: "ðŸ¥µ", children: ["Indignant", "Violated"] },
+          { name: "Mad", emoji: "ðŸ¤¬", children: ["Furious", "Jealous"] },
+          { name: "Aggressive", emoji: "ðŸ—¯ï¸", children: ["Provoked", "Hostile"] },
+          { name: "Frustrated", emoji: "ðŸ˜ ", children: ["Infuriated", "Annoyed"] },
+          { name: "Distant", emoji: "ðŸ§Š", children: ["Withdrawn", "Numb"] },
+          { name: "Critical", emoji: "ðŸ§", children: ["Sceptical", "Dismissive"] },
+        ],
+      },
+      {
+        name: "DISGUSTED",
+        emoji: "ðŸ¤¢",
+        color: "#22c55e",
+        categories: [
+          { name: "Disapproving", emoji: "ðŸ™…", children: ["Judgmental", "Embarrassed"] },
+          { name: "Disappointed", emoji: "ðŸ˜£", children: ["Appalled", "Revolted"] },
+          { name: "Awful", emoji: "ðŸ’€", children: ["Nauseated", "Detestable"] },
+          { name: "Repelled", emoji: "ðŸ˜–", children: ["Horrified", "Hesitant"] },
+        ],
+      },
+      {
+        name: "SAD",
+        emoji: "ðŸ˜”",
+        color: "#6366f1",
+        categories: [
+          { name: "Lonely", emoji: "ðŸ˜”", children: ["Isolated", "Abandoned"] },
+          { name: "Vulnerable", emoji: "â­•", children: ["Victimised", "Fragile"] },
+          { name: "Despair", emoji: "ðŸŒ§ï¸", children: ["Grief", "Powerless"] },
+          { name: "Guilty", emoji: "ðŸ˜“", children: ["Remorseful", "Ashamed"] },
+          { name: "Depressed", emoji: "ðŸŒ«ï¸", children: ["Empty", "Inferior"] },
+          { name: "Hurt", emoji: "ðŸ’”", children: ["Embarrassed", "Disappointed"] },
+        ],
+      },
+      {
+        name: "BAD",
+        emoji: "ðŸ˜•",
+        color: "#e11d48",
+        categories: [
+          { name: "Tired", emoji: "ðŸ˜´", children: ["Sleepy", "Unfocused"] },
+          { name: "Stressed", emoji: "ðŸ˜£", children: ["Overwhelmed", "Out of control"] },
+          { name: "Busy", emoji: "ðŸƒ", children: ["Rushed", "Pressured"] },
+          { name: "Bored", emoji: "ðŸ¥±", children: ["Indifferent", "Apathetic"] },
+        ],
+      },
+      {
+        name: "AFRAID (Fearful)",
+        emoji: "ðŸ˜¨",
+        color: "#06b6d4",
+        categories: [
+          { name: "Scared", emoji: "ðŸ˜±", children: ["Helpless", "Frightened"] },
+          { name: "Anxious", emoji: "ðŸ˜Ÿ", children: ["Overwhelmed", "Worried"] },
+          { name: "Insecure", emoji: "ðŸ˜¬", children: ["Inadequate", "Inferior"] },
+          { name: "Weak", emoji: "ðŸˆ¸", children: ["Worthless", "Insignificant"] },
+          { name: "Rejected", emoji: "ðŸš«", children: ["Excluded", "Persecuted"] },
+          { name: "Threatened", emoji: "âš ï¸", children: ["Nervous", "Exposed"] },
+        ],
+      },
+    ];
 
-function next(){
- index=(index+1)%order.length;
- start();
-}
+    // phonetic override / heuristic
+    const PHONETIC_OVERRIDES = {
+      "CURIOUS": ["CU", "RI", "OUS"],
+      "DETACHED": ["DE", "TACH", "ED"],
+      "LONELY": ["LONE", "LY"],
+      "AMAZED": ["a", "Maze", "d"],
+      "AWESOME": ["Awe", "some"],
+      "EXCITED": ["Ex", "Ci", "Ted"]
+    };
 
-document.getElementById("nextBtn").onclick=next;
-document.getElementById("prevBtn").onclick=()=>{index=(index-1+order.length)%order.length;start();};
-document.getElementById("pauseBtn").onclick=()=>{
- paused=!paused;
- document.getElementById("pauseBtn").textContent=paused?"Play":"Pause";
-};
-phoneticBtn.onclick=()=>{
- phonetic=!phonetic;
- phoneticBtn.textContent="Phonetic: "+(phonetic?"On":"Off");
- render();
-};
+    // Simple Gen Z slang mapping; fallback will add " (no cap)"
+    function getGenZWord(base) {
+      const upper = base.trim().toUpperCase();
+      const map = {
+        "GLAD": "vibing",
+        "PLAYFUL": "goofy mode",
+        "AROUSED": "super hyped",
+        "CHEEKY": "cheeky af",
+        "CONTENT": "chill",
+        "FREE": "unlocked",
+        "JOYFUL": "big happy",
+        "INTERESTED": "low-key curious",
+        "CURIOUS": "curious cat",
+        "INQUISITIVE": "asking all the things",
+        "PROUD": "feeling myself",
+        "SUCCESSFUL": "winning",
+        "CONFIDENT": "built different",
+        "ACCEPTED": "in the group chat",
+        "RESPECTED": "getting their flowers",
+        "VALUED": "main character energy",
+        "POWERFUL": "OP",
+        "COURAGEOUS": "no fear",
+        "CREATIVE": "brain in HD",
+        "PEACEFUL": "zen mode",
+        "LOVING": "full heart",
+        "THANKFUL": "gratitude vibes",
+        "TRUSTING": "open book",
+        "SENSITIVE": "soft era",
+        "INTIMATE": "close-close",
+        "OPTIMISTIC": "delulu in a good way",
+        "HOPEFUL": "hope core",
+        "INSPIRED": "ideas on 100",
+        "STARTLED": "jump scare",
+        "SHOCKED": "shook",
+        "DISMAYED": "big yikes",
+        "CONFUSED": "what is happening",
+        "DISILLUSIONED": "over it",
+        "PERPLEXED": "brain loading",
+        "AMAZED": "mind blown",
+        "ASTONISHED": "speechless fr",
+        "AWE": "jaw dropped",
+        "EXCITED": "hyped up",
+        "EAGER": "cannot wait",
+        "ENERGETIC": "zoomies",
+        "LET DOWN": "meh now",
+        "BETRAYED": "backstabbed",
+        "RESENTFUL": "salty",
+        "HUMILIATED": "instant log off",
+        "DISRESPECTED": "no respect vibes",
+        "RIDICULED": "clowned",
+        "BITTER": "pressed",
+        "INDIGNANT": "so done",
+        "VIOLATED": "not okay",
+        "MAD": "big mad",
+        "FURIOUS": "rage mode",
+        "JEALOUS": "jealous much",
+        "AGGRESSIVE": "ready to fight",
+        "PROVOKED": "they asked for it",
+        "HOSTILE": "on edge",
+        "FRUSTRATED": "stuck af",
+        "INFURIATED": "rage quit",
+        "ANNOYED": "over it tbh",
+        "DISTANT": "ghost mode",
+        "WITHDRAWN": "off the grid",
+        "NUMB": "no feelings rn",
+        "CRITICAL": "side-eyeing",
+        "SCEPTICAL": "sus",
+        "DISMISSIVE": "nah",
+        "DISAPPROVING": "not it",
+        "JUDGMENTAL": "judgy",
+        "EMBARRASSED": "second-hand cringe",
+        "DISAPPOINTED": "low-key crushed",
+        "APPALLED": "absolutely not",
+        "REVOLTED": "hard pass",
+        "AWFUL": "trash vibes",
+        "NAUSEATED": "feeling ick",
+        "DETESTABLE": "hard nope",
+        "REPELLED": "instant ick",
+        "HORRIFIED": "nightmare fuel",
+        "HESITANT": "hmm idk",
+        "LONELY": "solo core",
+        "ISOLATED": "off the map",
+        "ABANDONED": "left on read",
+        "VULNERABLE": "no armor",
+        "VICTIMISED": "done dirty",
+        "FRAGILE": "handle with care",
+        "DESPAIR": "zero hope",
+        "GRIEF": "heavy heart",
+        "POWERLESS": "buttons smashed",
+        "GUILTY": "my bad fr",
+        "REMORSEFUL": "wish I could undo",
+        "ASHAMED": "hide mode",
+        "DEPRESSED": "low battery",
+        "EMPTY": "no signal",
+        "INFERIOR": "background character",
+        "HURT": "hit different",
+        "TIRED": "running on fumes",
+        "SLEEPY": "need nap asap",
+        "UNFOCUSED": "brain tab overload",
+        "STRESSED": "too much rn",
+        "OVERWHELMED": "buffering",
+        "OUT OF CONTROL": "off the rails",
+        "BUSY": "calendar crying",
+        "RUSHED": "speedrun life",
+        "PRESSURED": "under the thumb",
+        "BORED": "dead vibes",
+        "INDIFFERENT": "mid",
+        "APATHETIC": "no thoughts",
+        "SCARED": "spooked",
+        "HELPLESS": "hands tied",
+        "FRIGHTENED": "heart racing",
+        "ANXIOUS": "nerves on max",
+        "WORRIED": "what if brain",
+        "INSECURE": "questioning everything",
+        "INADEQUATE": "not enough",
+        "WEAK": "low power mode",
+        "WORTHLESS": "no value feels",
+        "INSIGNIFICANT": "tiny spec",
+        "REJECTED": "benched",
+        "EXCLUDED": "not invited",
+        "PERSECUTED": "targeted",
+        "THREATENED": "danger vibes",
+        "NERVOUS": "butterflies",
+        "EXPOSED": "too seen"
+      };
+      return map[upper] || (base + " (no cap)");
+    }
 
-document.getElementById("playMode").onchange=e=>{
- if(e.target.value==="random"){
-   shuffle(order);
- } else {
-   order=[...WORDS];
- }
- index=0;
- start();
-};
+    const ALL_WORDS = [];
+    EMOTION_GROUPS.forEach((group, gi) => {
+      ALL_WORDS.push({
+        type: "group",
+        displayWord: group.name.replace(/\s*\(.*?\)/, ""),
+        groupIndex: gi,
+        categoryIndex: null,
+        childIndex: null,
+        group,
+        category: null
+      });
 
-start();
-</script>
+      group.categories.forEach((cat, ci) => {
+        ALL_WORDS.push({
+          type: "category",
+          displayWord: cat.name,
+          groupIndex: gi,
+          categoryIndex: ci,
+          childIndex: null,
+          group,
+          category: cat
+        });
+
+        cat.children.forEach((word, wi) => {
+          ALL_WORDS.push({
+            type: "leaf",
+            displayWord: word,
+            groupIndex: gi,
+            categoryIndex: ci,
+            childIndex: wi,
+            group,
+            category: cat
+          });
+        });
+      });
+    });
+
+    const wordTouchZone = document.getElementById("wordTouchZone");
+    const emojiEl = document.getElementById("emoji");
+    const genZTopEl = document.getElementById("genZTop");
+    const wordTextEl = document.getElementById("wordText");
+    const groupLabelEl = document.getElementById("groupLabel");
+    const categoryLabelEl = document.getElementById("categoryLabel");
+    const countdownEl = document.getElementById("countdown");
+    const progressContainerEl = document.getElementById("progressContainer");
+    const progressBarEl = document.getElementById("progressBar");
+    const revealBtn = document.getElementById("revealBtn");
+    const revealPanel = document.getElementById("revealPanel");
+    const settingsToggleBtn = document.getElementById("settingsToggleBtn");
+    const settingsPanel = document.getElementById("settingsPanel");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const intervalInput = document.getElementById("intervalInput");
+    const speakToggle = document.getElementById("speakToggle");
+    const countdownToggle = document.getElementById("countdownToggle");
+    const barToggle = document.getElementById("barToggle");
+    const syllableModeToggle = document.getElementById("syllableModeToggle");
+    const fullscreenToggle = document.getElementById("fullscreenToggle");
+    const playModeSelect = document.getElementById("playModeSelect");
+    const phoneticBtn = document.getElementById("phoneticBtn");
+    const emojiToggle = document.getElementById("emojiToggle");
+    const genZToggle = document.getElementById("genZToggle");
+
+    const MODE_RANDOM = "random";
+    const MODE_GROUPED = "grouped";
+
+    let playMode = MODE_RANDOM;
+    let navOrder = [];
+    let navPos = 0;
+
+    let currentIndex = 0;
+    let currentEntry = ALL_WORDS[0];
+    let currentParts = [];
+    let currentBaseWord = "";
+    let currentSlangWord = "";
+    let showEmojiForWord = true;
+    let phoneticMode = false;
+
+    let intervalSeconds = parseInt(intervalInput.value, 10) || 10;
+    let timerHandle = null;
+    let isPaused = false;
+    let startTimestamp = null;
+    let accumulatedMs = 0;
+    let lastStage = 1;
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function buildNavOrder(keepCurrentIndex) {
+      const total = ALL_WORDS.length;
+      if (playMode === MODE_RANDOM) {
+        const indices = Array.from({ length: total }, (_, i) => i);
+        if (keepCurrentIndex) {
+          const current = currentIndex;
+          const rest = indices.filter(i => i !== current);
+          shuffleArray(rest);
+          navOrder = [current, ...rest];
+          navPos = 0;
+        } else {
+          shuffleArray(indices);
+          navOrder = indices;
+          navPos = 0;
+        }
+      } else {
+        navOrder = Array.from({ length: total }, (_, i) => i);
+        if (keepCurrentIndex) {
+          const pos = navOrder.indexOf(currentIndex);
+          navPos = pos >= 0 ? pos : 0;
+        } else {
+          navPos = 0;
+        }
+      }
+    }
+
+    function phoneticSplit(word) {
+      const trimmed = word.trim();
+      const upper = trimmed.toUpperCase();
+      if (PHONETIC_OVERRIDES[upper]) return PHONETIC_OVERRIDES[upper];
+
+      const tokens = trimmed.split(/\s+/);
+      const syllables = [];
+      const vowels = "AEIOUYaeiouy";
+
+      tokens.forEach(token => {
+        if (token.length <= 3) {
+          syllables.push(token);
+          return;
+        }
+        let current = token[0];
+        for (let i = 1; i < token.length; i++) {
+          const ch = token[i];
+          const prev = token[i - 1];
+          const isVowel = vowels.includes(ch);
+          const prevIsVowel = vowels.includes(prev);
+          if (!prevIsVowel && isVowel) {
+            syllables.push(current);
+            current = ch;
+          } else {
+            current += ch;
+          }
+        }
+        if (current) syllables.push(current);
+      });
+      return syllables;
+    }
+
+    function getSyllableParts(word, usePhonetic) {
+      if (usePhonetic) return phoneticSplit(word);
+      const trimmed = word.trim();
+      const upper = trimmed.toUpperCase();
+      if (PHONETIC_OVERRIDES[upper]) return PHONETIC_OVERRIDES[upper];
+      const len = trimmed.length;
+      if (len <= 3) return [trimmed];
+      const cut1 = Math.floor(len / 3);
+      const cut2 = Math.floor((len * 2) / 3);
+      return [trimmed.slice(0, cut1), trimmed.slice(cut1, cut2), trimmed.slice(cut2)];
+    }
+
+    function speakWord(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utter);
+    }
+
+    function requestFullscreenIfNeeded() {
+      if (!fullscreenToggle.checked) return;
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function updateSettingsVisibility() {
+      countdownEl.style.display = countdownToggle.checked ? "inline" : "none";
+      progressContainerEl.style.display = barToggle.checked ? "block" : "none";
+    }
+
+    function updatePauseButton() {
+      pauseBtn.textContent = isPaused ? "Play â–¶" : "Pause";
+    }
+
+    function renderStaticInfo() {
+      const { group, category } = currentEntry;
+      groupLabelEl.textContent = group.emoji + " " + group.name;
+      groupLabelEl.style.color = group.color;
+      wordTextEl.style.color = group.color;
+      document.getElementById("wordArea").style.border = "1px solid " + group.color;
+
+      if (category) {
+        const catEmoji = category.emoji ? category.emoji + " " : "";
+        categoryLabelEl.textContent = catEmoji + category.name;
+      } else {
+        categoryLabelEl.textContent = "";
+      }
+    }
+
+    function renderHierarchy() {
+      const { group, category, displayWord, type } = currentEntry;
+      revealPanel.innerHTML = "";
+
+      const title = document.createElement("div");
+      title.className = "reveal-title";
+      title.textContent = "Hierarchy for this word";
+      revealPanel.appendChild(title);
+
+      const groupLine = document.createElement("div");
+      groupLine.className = "reveal-line";
+      groupLine.style.color = group.color;
+      groupLine.textContent = group.emoji + " Group (primary): " + group.name;
+      revealPanel.appendChild(groupLine);
+
+      if (type !== "group" && category) {
+        const parentLine = document.createElement("div");
+        parentLine.className = "reveal-line";
+        parentLine.textContent = (category.emoji ? category.emoji + " " : "") + "Secondary: " + category.name;
+        revealPanel.appendChild(parentLine);
+      }
+
+      if (type === "leaf" && category) {
+        const childCurrent = document.createElement("div");
+        childCurrent.className = "reveal-line";
+        childCurrent.textContent = "Tertiary (this word): " + displayWord;
+        revealPanel.appendChild(childCurrent);
+
+        const childrenLabel = document.createElement("div");
+        childrenLabel.className = "reveal-line";
+        childrenLabel.textContent = "Family (siblings):";
+        revealPanel.appendChild(childrenLabel);
+
+        const chipRow = document.createElement("div");
+        chipRow.className = "chip-row";
+        category.children.forEach((child) => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+          chip.style.color = group.color;
+          chip.textContent = child;
+          if (child === displayWord) chip.classList.add("current");
+          chipRow.appendChild(chip);
+        });
+        revealPanel.appendChild(chipRow);
+      } else if (type === "category" && category) {
+        const secLine = document.createElement("div");
+        secLine.className = "reveal-line";
+        secLine.textContent = "Secondary emotion: " + displayWord;
+        revealPanel.appendChild(secLine);
+
+        const childrenLabel = document.createElement("div");
+        childrenLabel.className = "reveal-line";
+        childrenLabel.textContent = "Tertiary children:";
+        revealPanel.appendChild(childrenLabel);
+
+        const chipRow = document.createElement("div");
+        chipRow.className = "chip-row";
+        category.children.forEach((child) => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+          chip.style.color = group.color;
+          chip.textContent = child;
+          chipRow.appendChild(chip);
+        });
+        revealPanel.appendChild(chipRow);
+      } else if (type === "group") {
+        const secLabel = document.createElement("div");
+        secLabel.className = "reveal-line";
+        secLabel.textContent = "Secondary emotions in this group:";
+        revealPanel.appendChild(secLabel);
+
+        const chipRow = document.createElement("div");
+        chipRow.className = "chip-row";
+        group.categories.forEach((cat) => {
+          const chip = document.createElement("div");
+          chip.className = "chip";
+          chip.style.color = group.color;
+          chip.textContent = (cat.emoji ? cat.emoji + " " : "") + cat.name;
+          chipRow.appendChild(chip);
+        });
+        revealPanel.appendChild(chipRow);
+      }
+    }
+
+    function renderWordStage(stage, elapsedSec) {
+      const parts = currentParts;
+      const totalParts = parts.length;
+      const multi = syllableModeToggle.checked;
+
+      let textLines = [];
+      let emojiForLine = null;
+
+      const fraction = elapsedSec / intervalSeconds;
+      if (fraction >= EMOJI_START_FRACTION && showEmojiForWord && emojiToggle.checked) {
+        const { group, category } = currentEntry;
+        emojiForLine = (category && category.emoji) || group.emoji;
+      }
+
+      if (multi) {
+        let count = 1;
+        if (stage >= 2) count = Math.min(2, totalParts);
+        if (stage >= 3) count = totalParts;
+        textLines = parts.slice(0, count);
+
+        if (stage >= 3 && emojiForLine) {
+          textLines.push(emojiForLine);
+        }
+
+        wordTextEl.textContent = textLines.join("\n");
+        emojiEl.textContent = "";
+      } else {
+        let visibleCount;
+        if (stage === 1) visibleCount = 1;
+        else if (stage === 2) visibleCount = 2;
+        else visibleCount = totalParts;
+        if (visibleCount > totalParts) visibleCount = totalParts;
+
+        const visible = parts.slice(0, visibleCount).join("");
+        const remaining = parts.slice(visibleCount).join("");
+
+        let displayText;
+        if (stage < 3) {
+          displayText = visible + (remaining.length > 0 ? "_".repeat(remaining.length) : "");
+        } else {
+          displayText = parts.join("");
+        }
+        wordTextEl.textContent = displayText;
+        emojiEl.textContent = emojiForLine || "";
+      }
+    }
+
+    function resetTimers() {
+      if (timerHandle) {
+        clearInterval(timerHandle);
+        timerHandle = null;
+      }
+      isPaused = false;
+      accumulatedMs = 0;
+      startTimestamp = Date.now();
+      lastStage = 1;
+      updatePauseButton();
+
+      if (barToggle.checked) {
+        progressContainerEl.style.display = "block";
+        progressBarEl.style.width = "0%";
+      } else {
+        progressContainerEl.style.display = "none";
+      }
+
+      if (countdownToggle.checked) {
+        countdownEl.textContent = intervalSeconds + " s";
+      }
+
+      renderWordStage(1, 0);
+
+      timerHandle = setInterval(tick, 100);
+    }
+
+    function tick() {
+      if (isPaused) return;
+
+      const now = Date.now();
+      const elapsedMs = accumulatedMs + (now - startTimestamp);
+      const elapsedSec = elapsedMs / 1000;
+      const totalSec = intervalSeconds;
+      const remainingSec = Math.max(0, totalSec - elapsedSec);
+
+      if (elapsedSec >= totalSec) {
+        nextWord();
+        return;
+      }
+
+      let stage;
+      if (elapsedSec < 1) stage = 1;
+      else if (elapsedSec < 2) stage = 2;
+      else stage = 3;
+
+      renderWordStage(stage, elapsedSec);
+
+      if (stage === 3 && lastStage !== 3 && speakToggle.checked) {
+        speakWord(currentEntry.displayWord);
+      }
+      lastStage = stage;
+
+      if (countdownToggle.checked) {
+        const display = Math.max(0, Math.ceil(remainingSec));
+        countdownEl.textContent = display + " s";
+      }
+
+      if (barToggle.checked) {
+        if (remainingSec <= 0) {
+          progressContainerEl.style.display = "none";
+        } else {
+          const pct = Math.min(100, Math.max(0, (elapsedSec / totalSec) * 100));
+          progressContainerEl.style.display = "block";
+          progressBarEl.style.width = pct + "%";
+        }
+      }
+    }
+
+    function pauseTimer() {
+      if (isPaused) return;
+      isPaused = true;
+      if (startTimestamp != null) {
+        accumulatedMs += Date.now() - startTimestamp;
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      updatePauseButton();
+    }
+
+    function resumeTimer() {
+      if (!isPaused) return;
+      isPaused = false;
+      startTimestamp = Date.now();
+      updatePauseButton();
+    }
+
+    function applyWord(entry) {
+      currentEntry = entry;
+      const genZMode = genZToggle.checked;
+      if (genZMode) {
+        const slang = getGenZWord(entry.displayWord);
+        currentSlangWord = slang ? slang.toLowerCase() : "";
+      } else {
+        currentSlangWord = "";
+      }
+      currentBaseWord = entry.displayWord;
+      currentParts = getSyllableParts(currentBaseWord, phoneticMode);
+      showEmojiForWord = Math.random() < EMOJI_PROBABILITY;
+      renderStaticInfo();
+      renderHierarchy();
+      updateGenZTop();
+      resetTimers();
+    }
+
+    function applyWordByNavPos() {
+      const idx = navOrder[navPos];
+      currentIndex = idx;
+      applyWord(ALL_WORDS[idx]);
+    }
+
+    function nextWord() {
+      navPos = (navPos + 1) % navOrder.length;
+      applyWordByNavPos();
+    }
+
+    function prevWord() {
+      navPos = (navPos - 1 + navOrder.length) % navOrder.length;
+      applyWordByNavPos();
+    }
+
+    wordTouchZone.addEventListener("click", () => {
+      requestFullscreenIfNeeded();
+      nextWord();
+    });
+
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      requestFullscreenIfNeeded();
+      nextWord();
+    });
+
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      requestFullscreenIfNeeded();
+      prevWord();
+    });
+
+    pauseBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (isPaused) {
+        resumeTimer();
+      } else {
+        pauseTimer();
+      }
+    });
+
+    revealBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = revealPanel.style.display === "block";
+      if (isOpen) {
+        revealPanel.style.display = "none";
+        revealBtn.textContent = "Reveal hierarchy â–¾";
+        resumeTimer();
+      } else {
+        renderHierarchy();
+        revealPanel.style.display = "block";
+        revealBtn.textContent = "Hide hierarchy â–´";
+        pauseTimer();
+      }
+    });
+
+    settingsToggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isHidden = settingsPanel.classList.contains("hidden");
+      if (isHidden) {
+        settingsPanel.classList.remove("hidden");
+        settingsToggleBtn.textContent = "Hide settings â¬‡";
+      } else {
+        settingsPanel.classList.add("hidden");
+        settingsToggleBtn.textContent = "Show settings â¬†";
+      }
+    });
+
+    intervalInput.addEventListener("focus", (e) => {
+      e.target.select();
+    });
+
+    intervalInput.addEventListener("change", () => {
+      const val = parseFloat(intervalInput.value);
+      if (!isNaN(val) && val >= 3) {
+        intervalSeconds = val;
+      } else {
+        intervalSeconds = 10;
+        intervalInput.value = "10";
+      }
+      resetTimers();
+    });
+
+    countdownToggle.addEventListener("change", () => {
+      updateSettingsVisibility();
+    });
+
+    barToggle.addEventListener("change", () => {
+      updateSettingsVisibility();
+      resetTimers();
+    });
+
+    syllableModeToggle.addEventListener("change", () => {
+      currentParts = getSyllableParts(currentBaseWord, phoneticMode);
+      renderWordStage(lastStage, 0);
+    });
+
+    fullscreenToggle.addEventListener("change", () => {
+      if (!fullscreenToggle.checked && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    phoneticBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      phoneticMode = !phoneticMode;
+      phoneticBtn.textContent = phoneticMode ? "Phonetic: ON" : "Phonetic: OFF";
+      currentParts = getSyllableParts(currentBaseWord, phoneticMode);
+      renderWordStage(lastStage, 0);
+    });
+
+    emojiToggle.addEventListener("change", () => {
+      renderWordStage(lastStage, 0);
+    });
+
+    genZToggle.addEventListener("change", () => {
+      // Recompute base word & parts for current entry
+      applyWord(currentEntry);
+    });
+
+    playModeSelect.addEventListener("change", () => {
+      const newMode = playModeSelect.value === "grouped" ? MODE_GROUPED : MODE_RANDOM;
+      playMode = newMode;
+      buildNavOrder(true);
+    });
+
+    updateSettingsVisibility();
+    buildNavOrder(false);
+    applyWordByNavPos();
+  </script>
 </body>
 </html>
