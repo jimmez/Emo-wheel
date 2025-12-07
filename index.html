@@ -1,13 +1,13 @@
-<!-- Emotional Generator v05 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v21 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator â€“ Mode 1</title>
+  <title>Emotional Generator v21 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
       background: #020617;
       color: #e5e7eb;
     }
@@ -34,8 +34,9 @@
     /* WATERMARK â€“ small, no blur, fades after 5s */
     .watermark {
       position: fixed;
-      right: 10px;
-      bottom: 6px;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 0.75rem;
       color: #9ca3af;
       opacity: 0.9;
@@ -110,6 +111,7 @@
       margin-bottom: 4px;
       min-height: 2.4rem;
       text-align: left;
+      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif;
     }
 
     .word-text {
@@ -122,6 +124,14 @@
       line-height: 1.1;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       white-space: pre;
+    }
+
+    .genz-slang-mode {
+      color: #7dd3fc;
+      font-style: italic;
+      font-variant: normal;
+      text-transform: lowercase;
+      font-family: "Comic Sans MS","Segoe Script","Brush Script MT",cursive;
     }
 
     .status-row {
@@ -170,6 +180,7 @@
       width: 0%;
       background: linear-gradient(90deg, #22c55e, #eab308);
       transition: width 0.1s linear;
+      margin-left: auto; /* anchor on right so it shrinks from left->right */
     }
 
     .top-controls {
@@ -348,11 +359,11 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James â€“ 07.12.2025 â€“ v05
+      Jimmy James - 07.12.2025 - v21
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator</h1>
+      <h1>Emotional Generator v21</h1>
       <div class="mode-label">Mode 1 Â· Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
@@ -363,6 +374,7 @@
 
         <div class="status-row">
           <span id="groupLabel" class="group-label"></span>
+          <span id="originalLabel"></span>
           <span id="categoryLabel"></span>
         </div>
 
@@ -376,15 +388,16 @@
         <div class="top-controls">
           <button id="revealBtn" class="reveal-toggle">Reveal hierarchy â–¾</button>
           <button id="phoneticBtn" class="phonetic-toggle">Phonetic: OFF</button>
+          <button id="fullscreenBtn" class="phonetic-toggle">Fullscreen: OFF</button>
           <button id="settingsToggleBtn" class="settings-toggle">Hide settings â¬‡</button>
         </div>
 
         <div id="revealPanel" class="reveal-panel"></div>
 
         <div class="nav-row">
-          <button id="prevBtn" class="nav-btn">â—€ Prev</button>
-          <button id="pauseBtn" class="nav-btn">Pause â¸</button>
-          <button id="nextBtn" class="nav-btn">Next â–¶</button>
+          <button id="prevBtn" class="nav-btn">â®ï¸ Prev</button>
+          <button id="pauseBtn" class="nav-btn">â¸ï¸ Pause</button>
+          <button id="nextBtn" class="nav-btn">Next â­ï¸</button>
         </div>
       </div>
     </div>
@@ -395,7 +408,11 @@
         <div class="settings-row">
           <label>
             Seconds / word:
-            <input id="intervalInput" type="number" min="3" step="1" value="10" />
+            <input id="intervalInput" type="number" min="1" step="1" value="5" />
+          </label>
+          <label>
+            Syllable speed (1â€“10):
+            <input id="syllableSpeedInput" type="number" min="1" max="10" step="1" value="5" />
           </label>
           <label>
             <input id="speakToggle" type="checkbox" />
@@ -420,8 +437,15 @@
             Syllables on separate lines
           </label>
           <label>
-            <input id="fullscreenToggle" type="checkbox" checked />
+            <input id="fullscreenToggle" type="checkbox" />
             Fullscreen mode
+          </label>
+        </div>
+
+        <div class="settings-row">
+          <label>
+            <input id="wholeWordToggle" type="checkbox" />
+            Show whole word (no staged reveal)
           </label>
         </div>
 
@@ -559,7 +583,12 @@
       "LONELY": ["LONE", "LY"],
       "AMAZED": ["a", "Maze", "d"],
       "AWESOME": ["Awe", "some"],
-      "EXCITED": ["Ex", "Ci", "Ted"]
+      "EXCITED": ["Ex", "Ci", "Ted"],
+      "RIDICULED": ["Rid", "i", "culed"],
+      "SCARED": ["Scar", "ed"],
+      "SCEPTICAL": ["Scep", "tic", "al"],
+      "HESITANT": ["Hes", "it", "ant"],
+      "HELPLESS": ["help", "less"]
     };
 
     // Simple Gen Z slang mapping; fallback will add " (no cap)"
@@ -731,6 +760,7 @@
     const emojiEl = document.getElementById("emoji");
     const wordTextEl = document.getElementById("wordText");
     const groupLabelEl = document.getElementById("groupLabel");
+    const originalLabelEl = document.getElementById("originalLabel");
     const categoryLabelEl = document.getElementById("categoryLabel");
     const countdownEl = document.getElementById("countdown");
     const progressContainerEl = document.getElementById("progressContainer");
@@ -738,16 +768,19 @@
     const revealBtn = document.getElementById("revealBtn");
     const revealPanel = document.getElementById("revealPanel");
     const settingsToggleBtn = document.getElementById("settingsToggleBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
     const settingsPanel = document.getElementById("settingsPanel");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const pauseBtn = document.getElementById("pauseBtn");
     const intervalInput = document.getElementById("intervalInput");
+    const syllableSpeedInput = document.getElementById("syllableSpeedInput");
     const speakToggle = document.getElementById("speakToggle");
     const countdownToggle = document.getElementById("countdownToggle");
     const barToggle = document.getElementById("barToggle");
     const syllableModeToggle = document.getElementById("syllableModeToggle");
     const fullscreenToggle = document.getElementById("fullscreenToggle");
+    const wholeWordToggle = document.getElementById("wholeWordToggle");
     const playModeSelect = document.getElementById("playModeSelect");
     const phoneticBtn = document.getElementById("phoneticBtn");
     const emojiToggle = document.getElementById("emojiToggle");
@@ -767,7 +800,9 @@
     let showEmojiForWord = true;
     let phoneticMode = false;
 
-    let intervalSeconds = parseInt(intervalInput.value, 10) || 10;
+    let intervalSeconds = parseFloat(intervalInput.value) || 5;
+    let syllableSpeedLevel = parseInt(syllableSpeedInput.value, 10) || 5;
+    let syllableVisibleCount = 1;
     let timerHandle = null;
     let isPaused = false;
     let startTimestamp = null;
@@ -807,6 +842,24 @@
       }
     }
 
+    function mapSyllableLevelToSeconds(level) {
+      const rounded = Math.round(level);
+      // 5 = base (1.0s per syllable)
+      // 10 = very fast  -> ~0.2s
+      // 1 = very slow   -> ~2.0s
+      // Keep earlier 2â€“7 mappings and extend to 1,8,9,10.
+      if (rounded <= 1) return 2.0;   // very slow
+      if (rounded === 2) return 1.8;
+      if (rounded === 3) return 1.4;
+      if (rounded === 4) return 1.2;
+      if (rounded === 5) return 1.0;
+      if (rounded === 6) return 0.8;
+      if (rounded === 7) return 0.6;
+      if (rounded === 8) return 0.5;
+      if (rounded === 9) return 0.3;
+      return 0.2; // 10 and above: very fast
+    }
+
     function phoneticSplit(word) {
       const trimmed = word.trim();
       const upper = trimmed.toUpperCase();
@@ -840,9 +893,17 @@
     }
 
     function getSyllableParts(word, usePhonetic) {
-      if (usePhonetic) return phoneticSplit(word);
       const trimmed = word.trim();
       const upper = trimmed.toUpperCase();
+
+      // In Gen Z mode, split slang into word-like chunks (spaces, slashes, hyphens),
+      // so pieces feel like mini-words: e.g. "low-key curious" -> ["low", "key", "curious"]
+      if (genZToggle && genZToggle.checked) {
+        if (!trimmed) return [];
+        return trimmed.split(/[\s\/\-]+/);
+      }
+
+      if (usePhonetic) return phoneticSplit(word);
       if (PHONETIC_OVERRIDES[upper]) return PHONETIC_OVERRIDES[upper];
       const len = trimmed.length;
       if (len <= 3) return [trimmed];
@@ -871,14 +932,48 @@
     }
 
     function updatePauseButton() {
-      pauseBtn.textContent = isPaused ? "Play â–¶" : "Pause â¸";
+      pauseBtn.textContent = isPaused ? "â–¶ï¸ Play" : "â¸ï¸ Pause";
+    }
+
+    function updateFullscreenButton() {
+      if (!fullscreenBtn) return;
+      fullscreenBtn.textContent = fullscreenToggle.checked ? "Fullscreen: ON" : "Fullscreen: OFF";
+    }
+
+    function updateGenZStyle() {
+      if (genZToggle.checked) {
+        wordTextEl.classList.add("genz-slang-mode");
+        // let CSS set color (light blue)
+        wordTextEl.style.color = "";
+      } else {
+        wordTextEl.classList.remove("genz-slang-mode");
+      }
     }
 
     function renderStaticInfo() {
       const { group, category } = currentEntry;
+      const genZMode = genZToggle.checked;
+      const original = currentEntry.displayWord;
+
       groupLabelEl.textContent = group.emoji + " " + group.name;
       groupLabelEl.style.color = group.color;
-      wordTextEl.style.color = group.color;
+
+      // Original word label in the center (Gen Z mode only)
+      if (genZMode) {
+        originalLabelEl.textContent = original;
+        originalLabelEl.style.color = group.color;
+      } else {
+        originalLabelEl.textContent = "";
+      }
+
+      // Only force group color on main word when Gen Z mode is OFF;
+      // when Gen Z is ON, CSS (.genz-slang-mode) controls the light-blue color.
+      if (!genZMode) {
+        wordTextEl.style.color = group.color;
+      } else {
+        wordTextEl.style.color = "";
+      }
+
       document.getElementById("wordArea").style.border = "1px solid " + group.color;
 
       if (category) {
@@ -980,6 +1075,7 @@
       const genZMode = genZToggle.checked;
       const original = currentEntry.displayWord;
       const base = currentBaseWord;
+      const whole = wholeWordToggle.checked;
 
       let textLines = [];
       let emojiForLine = null;
@@ -990,15 +1086,38 @@
         emojiForLine = (category && category.emoji) || group.emoji;
       }
 
-      if (multi) {
-        let count = 1;
-        if (stage >= 2) count = Math.min(2, totalParts);
-        if (stage >= 3) count = totalParts;
-        textLines = parts.slice(0, count);
-
-        if (stage >= 3 && genZMode && base !== original) {
-          textLines.push(original);
+      // Whole-word mode: always show the complete word from the start
+      if (whole) {
+        if (multi) {
+          textLines = parts.slice();
+          if (emojiForLine) {
+            textLines.push(emojiForLine);
+          }
+          wordTextEl.textContent = textLines.join("\n");
+          emojiEl.textContent = "";
+        } else {
+          let displayText;
+          if (genZMode) {
+            displayText = parts.join(" ");
+          } else {
+            displayText = parts.join("");
+          }
+          wordTextEl.textContent = displayText;
+          emojiEl.textContent = emojiForLine || "";
         }
+        return;
+      }
+
+      if (multi) {
+        // In syllable-line mode, use syllableVisibleCount when not in whole-word mode.
+        if (!whole) {
+          const count = Math.max(1, Math.min(syllableVisibleCount, totalParts));
+          textLines = parts.slice(0, count);
+        } else {
+          // whole-word + multi: just show full word
+          textLines = parts.slice();
+        }
+
         if (stage >= 3 && emojiForLine) {
           textLines.push(emojiForLine);
         }
@@ -1007,21 +1126,37 @@
         emojiEl.textContent = "";
       } else {
         let visibleCount;
-        if (stage === 1) visibleCount = 1;
-        else if (stage === 2) visibleCount = 2;
-        else visibleCount = totalParts;
+        if (!whole) {
+          // Use syllableVisibleCount driven by syllable speed
+          visibleCount = Math.max(1, Math.min(syllableVisibleCount, totalParts));
+        } else {
+          if (stage === 1) visibleCount = 1;
+          else if (stage === 2) visibleCount = 2;
+          else visibleCount = totalParts;
+        }
         if (visibleCount > totalParts) visibleCount = totalParts;
 
-        const visible = parts.slice(0, visibleCount).join("");
-        const remaining = parts.slice(visibleCount).join("");
+        const visibleParts = parts.slice(0, visibleCount);
+        const remainingParts = parts.slice(visibleCount);
 
         let displayText;
-        if (stage < 3) {
-          displayText = visible + (remaining.length > 0 ? "_".repeat(remaining.length) : "");
+        if (genZMode) {
+          const visibleStr = visibleParts.join(" ");
+          const remainingStr = remainingParts.join(" ");
+          if (stage < 3) {
+            const underscoreBlocks = remainingParts.map(p => "_".repeat(p.length));
+            const underscoreStr = underscoreBlocks.join(" ");
+            displayText = visibleStr + (underscoreStr ? (visibleStr ? " " : "") + underscoreStr : "");
+          } else {
+            displayText = parts.join(" ");
+          }
         } else {
-          displayText = parts.join("");
-          if (genZMode && base !== original) {
-            displayText += "  â†’  " + original;
+          const visible = visibleParts.join("");
+          const remaining = remainingParts.join("");
+          if (stage < 3) {
+            displayText = visible + (remaining.length > 0 ? "_".repeat(remaining.length) : "");
+          } else {
+            displayText = parts.join("");
           }
         }
         wordTextEl.textContent = displayText;
@@ -1042,7 +1177,7 @@
 
       if (barToggle.checked) {
         progressContainerEl.style.display = "block";
-        progressBarEl.style.width = "0%";
+        progressBarEl.style.width = "100%";
       } else {
         progressContainerEl.style.display = "none";
       }
@@ -1070,10 +1205,31 @@
         return;
       }
 
-      let stage;
-      if (elapsedSec < 1) stage = 1;
-      else if (elapsedSec < 2) stage = 2;
-      else stage = 3;
+      const multi = syllableModeToggle.checked;
+      const whole = wholeWordToggle.checked;
+      let stage = 1;
+
+      if (!whole) {
+        // Use syllable speed for how quickly new syllables/chunks appear,
+        // for both multi-line and single-line reveal modes.
+        const partsCount = currentParts.length || 1;
+        let syllSec = mapSyllableLevelToSeconds(syllableSpeedLevel);
+
+        if (syllSec * partsCount > totalSec && totalSec > 0) {
+          syllSec = totalSec / partsCount;
+        }
+
+        const visible = Math.min(partsCount, Math.floor(elapsedSec / syllSec) + 1);
+        syllableVisibleCount = visible;
+
+        stage = (visible >= partsCount) ? 3 : (visible >= 2 ? 2 : 1);
+      } else {
+        // Whole-word mode: keep a simple 3-phase notion just for speech timing.
+        const fraction = totalSec > 0 ? (elapsedSec / totalSec) : 0;
+        if (fraction < 1 / 3) stage = 1;
+        else if (fraction < 2 / 3) stage = 2;
+        else stage = 3;
+      }
 
       renderWordStage(stage, elapsedSec);
 
@@ -1088,10 +1244,10 @@
       }
 
       if (barToggle.checked) {
-        if (remainingSec <= 0) {
+        if (remainingSec <= 0 || totalSec <= 0) {
           progressContainerEl.style.display = "none";
         } else {
-          const pct = Math.min(100, Math.max(0, (elapsedSec / totalSec) * 100));
+          const pct = Math.min(100, Math.max(0, (remainingSec / totalSec) * 100));
           progressContainerEl.style.display = "block";
           progressBarEl.style.width = pct + "%";
         }
@@ -1202,15 +1358,51 @@
       e.target.select();
     });
 
-    intervalInput.addEventListener("change", () => {
-      const val = parseFloat(intervalInput.value);
-      if (!isNaN(val) && val >= 3) {
+    function applyIntervalFromInput() {
+      const val = parseInt(intervalInput.value, 10);
+      if (!isNaN(val) && val >= 1) {
         intervalSeconds = val;
+        intervalInput.value = String(val);
       } else {
-        intervalSeconds = 10;
-        intervalInput.value = "10";
+        intervalSeconds = 5;
+        intervalInput.value = "5";
       }
       resetTimers();
+    }
+
+    intervalInput.addEventListener("change", applyIntervalFromInput);
+    intervalInput.addEventListener("blur", applyIntervalFromInput);
+    intervalInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        intervalInput.blur();
+      }
+    });
+
+    function applySyllableSpeedFromInput() {
+      const val = parseInt(syllableSpeedInput.value, 10);
+      if (!isNaN(val)) {
+        syllableSpeedLevel = val;
+        if (syllableSpeedLevel < 1) syllableSpeedLevel = 1;
+        if (syllableSpeedLevel > 10) syllableSpeedLevel = 10;
+        syllableSpeedInput.value = String(syllableSpeedLevel);
+      } else {
+        syllableSpeedLevel = 5;
+        syllableSpeedInput.value = "5";
+      }
+      // No full reset; tick will pick up the new speed.
+    }
+
+    syllableSpeedInput.addEventListener("focus", (e) => {
+      e.target.select();
+    });
+    syllableSpeedInput.addEventListener("change", applySyllableSpeedFromInput);
+    syllableSpeedInput.addEventListener("blur", applySyllableSpeedFromInput);
+    syllableSpeedInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        syllableSpeedInput.blur();
+      }
     });
 
     countdownToggle.addEventListener("change", () => {
@@ -1231,6 +1423,7 @@
       if (!fullscreenToggle.checked && document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
       }
+      updateFullscreenButton();
     });
 
     phoneticBtn.addEventListener("click", (e) => {
@@ -1241,12 +1434,28 @@
       renderWordStage(lastStage, 0);
     });
 
+    fullscreenBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fullscreenToggle.checked = !fullscreenToggle.checked;
+      updateFullscreenButton();
+      if (fullscreenToggle.checked) {
+        requestFullscreenIfNeeded();
+      } else if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    wholeWordToggle.addEventListener("change", () => {
+      renderWordStage(lastStage, 0);
+    });
+
     emojiToggle.addEventListener("change", () => {
       renderWordStage(lastStage, 0);
     });
 
     genZToggle.addEventListener("change", () => {
       // Recompute base word & parts for current entry
+      updateGenZStyle();
       applyWord(currentEntry);
     });
 
@@ -1256,7 +1465,18 @@
       buildNavOrder(true);
     });
 
+
+    // Keyboard controls for PC: Space or Enter -> next word
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" || e.code === "Enter") {
+        e.preventDefault();
+        nextWord();
+      }
+    });
+
     updateSettingsVisibility();
+    updateGenZStyle();
+    updateFullscreenButton();
     buildNavOrder(false);
     applyWordByNavPos();
   </script>
