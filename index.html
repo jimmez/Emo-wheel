@@ -1,9 +1,9 @@
-<!-- Emotional Generator v30 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v32 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v30 â€“ Mode 1</title>
+  <title>Emotional Generator v32 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -360,11 +360,11 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James - 07.12.2025 - v30
+      Jimmy James - 07.12.2025 - v32
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v30</h1>
+      <h1>Emotional Generator v32</h1>
       <div class="mode-label">Mode 1 - Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
@@ -460,10 +460,6 @@
 
         <div class="settings-row">
           <label>
-            <input id="emojiToggle" type="checkbox" />
-            Show emoji
-          </label>
-          <label>
             <input id="genZToggle" type="checkbox" />
             Gen Z slang mode
           </label>
@@ -487,92 +483,92 @@
     const EMOTION_GROUPS = [
       {
         name: "GLAD (Happy)",
-        emoji: "ðŸ˜Š",
+        emoji: "",
         color: "#fbbf24",
         categories: [
-          { name: "Playful", emoji: "ðŸ˜Š", children: ["Aroused", "Cheeky"] },
-          { name: "Content", emoji: "ðŸ™‚", children: ["Free", "Joyful"] },
-          { name: "Interested", emoji: "ðŸ¤”", children: ["Curious", "Inquisitive"] },
-          { name: "Proud", emoji: "ðŸ˜Œ", children: ["Successful", "Confident"] },
-          { name: "Accepted", emoji: "ðŸ¤", children: ["Respected", "Valued"] },
-          { name: "Powerful", emoji: "ðŸ’ª", children: ["Courageous", "Creative"] },
-          { name: "Peaceful", emoji: "ðŸ•Šï¸", children: ["Loving", "Thankful"] },
-          { name: "Trusting", emoji: "ðŸ¤—", children: ["Sensitive", "Intimate"] },
-          { name: "Optimistic", emoji: "ðŸŒˆ", children: ["Hopeful", "Inspired"] },
+          { name: "Playful", emoji: "", children: ["Aroused", "Cheeky"] },
+          { name: "Content", emoji: "", children: ["Free", "Joyful"] },
+          { name: "Interested", emoji: "", children: ["Curious", "Inquisitive"] },
+          { name: "Proud", emoji: "", children: ["Successful", "Confident"] },
+          { name: "Accepted", emoji: "", children: ["Respected", "Valued"] },
+          { name: "Powerful", emoji: "", children: ["Courageous", "Creative"] },
+          { name: "Peaceful", emoji: "", children: ["Loving", "Thankful"] },
+          { name: "Trusting", emoji: "", children: ["Sensitive", "Intimate"] },
+          { name: "Optimistic", emoji: "", children: ["Hopeful", "Inspired"] },
         ],
       },
       {
         name: "SURPRISED",
-        emoji: "ðŸ˜®",
+        emoji: "",
         color: "#38bdf8",
         categories: [
-          { name: "Startled", emoji: "ðŸ˜³", children: ["Shocked", "Dismayed"] },
-          { name: "Confused", emoji: "ðŸ˜•", children: ["Disillusioned", "Perplexed"] },
-          { name: "Amazed", emoji: "ðŸ¤©", children: ["Astonished", "Awe"] },
-          { name: "Excited", emoji: "ðŸ˜ƒ", children: ["Eager", "Energetic"] },
+          { name: "Startled", emoji: "", children: ["Shocked", "Dismayed"] },
+          { name: "Confused", emoji: "", children: ["Disillusioned", "Perplexed"] },
+          { name: "Amazed", emoji: "", children: ["Astonished", "Awe"] },
+          { name: "Excited", emoji: "", children: ["Eager", "Energetic"] },
         ],
       },
       {
         name: "BAD (Angry)",
-        emoji: "ðŸ˜¡",
+        emoji: "",
         color: "#f97316",
         categories: [
-          { name: "Let down", emoji: "ðŸ˜ž", children: ["Betrayed", "Resentful"] },
-          { name: "Humiliated", emoji: "ðŸ˜³", children: ["Disrespected", "Ridiculed"] },
-          { name: "Bitter", emoji: "ðŸ¥µ", children: ["Indignant", "Violated"] },
-          { name: "Mad", emoji: "ðŸ¤¬", children: ["Furious", "Jealous"] },
-          { name: "Aggressive", emoji: "ðŸ—¯ï¸", children: ["Provoked", "Hostile"] },
-          { name: "Frustrated", emoji: "ðŸ˜ ", children: ["Infuriated", "Annoyed"] },
-          { name: "Distant", emoji: "ðŸ˜¶", children: ["Withdrawn", "Numb"] },
-          { name: "Critical", emoji: "ðŸ˜’", children: ["Sceptical", "Dismissive"] },
+          { name: "Let down", emoji: "", children: ["Betrayed", "Resentful"] },
+          { name: "Humiliated", emoji: "", children: ["Disrespected", "Ridiculed"] },
+          { name: "Bitter", emoji: "", children: ["Indignant", "Violated"] },
+          { name: "Mad", emoji: "", children: ["Furious", "Jealous"] },
+          { name: "Aggressive", emoji: "", children: ["Provoked", "Hostile"] },
+          { name: "Frustrated", emoji: "", children: ["Infuriated", "Annoyed"] },
+          { name: "Distant", emoji: "", children: ["Withdrawn", "Numb"] },
+          { name: "Critical", emoji: "", children: ["Sceptical", "Dismissive"] },
         ],
       },
       {
         name: "DISGUSTED",
-        emoji: "ðŸ¤¢",
+        emoji: "",
         color: "#22c55e",
         categories: [
-          { name: "Disapproving", emoji: "ðŸ™…", children: ["Judgmental", "Embarrassed"] },
-          { name: "Disappointed", emoji: "ðŸ˜£", children: ["Appalled", "Revolted"] },
-          { name: "Awful", emoji: "ðŸ’€", children: ["Nauseated", "Detestable"] },
-          { name: "Repelled", emoji: "ðŸ˜–", children: ["Horrified", "Hesitant"] },
+          { name: "Disapproving", emoji: "", children: ["Judgmental", "Embarrassed"] },
+          { name: "Disappointed", emoji: "", children: ["Appalled", "Revolted"] },
+          { name: "Awful", emoji: "", children: ["Nauseated", "Detestable"] },
+          { name: "Repelled", emoji: "", children: ["Horrified", "Hesitant"] },
         ],
       },
       {
         name: "SAD",
-        emoji: "ðŸ˜”",
+        emoji: "",
         color: "#6366f1",
         categories: [
-          { name: "Lonely", emoji: "ðŸ˜”", children: ["Isolated", "Abandoned"] },
-          { name: "Vulnerable", emoji: "â­•", children: ["Victimised", "Fragile"] },
-          { name: "Despair", emoji: "ðŸŒ§ï¸", children: ["Grief", "Powerless"] },
-          { name: "Guilty", emoji: "ðŸ˜“", children: ["Remorseful", "Ashamed"] },
-          { name: "Depressed", emoji: "ðŸŒ«ï¸", children: ["Empty", "Inferior"] },
-          { name: "Hurt", emoji: "ðŸ’”", children: ["Embarrassed", "Disappointed"] },
+          { name: "Lonely", emoji: "", children: ["Isolated", "Abandoned"] },
+          { name: "Vulnerable", emoji: "", children: ["Victimised", "Fragile"] },
+          { name: "Despair", emoji: "", children: ["Grief", "Powerless"] },
+          { name: "Guilty", emoji: "", children: ["Remorseful", "Ashamed"] },
+          { name: "Depressed", emoji: "", children: ["Empty", "Inferior"] },
+          { name: "Hurt", emoji: "", children: ["Embarrassed", "Disappointed"] },
         ],
       },
       {
         name: "BAD (low mood)",
-        emoji: "ðŸ˜•",
+        emoji: "",
         color: "#e11d48",
         categories: [
-          { name: "Tired", emoji: "ðŸ˜´", children: ["Sleepy", "Unfocused"] },
-          { name: "Stressed", emoji: "ðŸ˜«", children: ["Overwhelmed", "Out of control"] },
-          { name: "Busy", emoji: "ðŸ˜°", children: ["Rushed", "Pressured"] },
-          { name: "Bored", emoji: "ðŸ˜", children: ["Indifferent", "Apathetic"] },
+          { name: "Tired", emoji: "", children: ["Sleepy", "Unfocused"] },
+          { name: "Stressed", emoji: "", children: ["Overwhelmed", "Out of control"] },
+          { name: "Busy", emoji: "", children: ["Rushed", "Pressured"] },
+          { name: "Bored", emoji: "", children: ["Indifferent", "Apathetic"] },
         ],
       },
       {
         name: "AFRAID (Fearful)",
-        emoji: "ðŸ˜¨",
+        emoji: "",
         color: "#06b6d4",
         categories: [
-          { name: "Scared", emoji: "ðŸ˜±", children: ["Helpless", "Frightened"] },
-          { name: "Anxious", emoji: "ðŸ˜Ÿ", children: ["Overwhelmed", "Worried"] },
-          { name: "Insecure", emoji: "ðŸ˜¬", children: ["Inadequate", "Inferior"] },
-          { name: "Weak", emoji: "ðŸ˜ž", children: ["Worthless", "Insignificant"] },
-          { name: "Rejected", emoji: "ðŸš«", children: ["Excluded", "Persecuted"] },
-          { name: "Threatened", emoji: "âš ï¸", children: ["Nervous", "Exposed"] },
+          { name: "Scared", emoji: "", children: ["Helpless", "Frightened"] },
+          { name: "Anxious", emoji: "", children: ["Overwhelmed", "Worried"] },
+          { name: "Insecure", emoji: "", children: ["Inadequate", "Inferior"] },
+          { name: "Weak", emoji: "", children: ["Worthless", "Insignificant"] },
+          { name: "Rejected", emoji: "", children: ["Excluded", "Persecuted"] },
+          { name: "Threatened", emoji: "", children: ["Nervous", "Exposed"] },
         ],
       },
     ];
@@ -784,7 +780,6 @@
     const wholeWordToggle = document.getElementById("wholeWordToggle");
     const playModeSelect = document.getElementById("playModeSelect");
     const phoneticBtn = document.getElementById("phoneticBtn");
-    const emojiToggle = document.getElementById("emojiToggle");
     const genZToggle = document.getElementById("genZToggle");
 
     const MODE_RANDOM = "random";
@@ -956,7 +951,7 @@
       const genZMode = genZToggle.checked;
       const original = currentEntry.displayWord;
 
-      groupLabelEl.textContent = group.emoji + " " + group.name;
+      groupLabelEl.textContent = group.name;
       groupLabelEl.style.color = group.color;
 
       // Original word label in the center (Gen Z mode only)
@@ -978,8 +973,7 @@
       document.getElementById("wordArea").style.border = "1px solid " + group.color;
 
       if (category) {
-        const catEmoji = category.emoji ? category.emoji + " " : "";
-        categoryLabelEl.textContent = catEmoji + category.name;
+        categoryLabelEl.textContent = category.name;
       } else {
         categoryLabelEl.textContent = "";
       }
@@ -997,13 +991,13 @@
       const groupLine = document.createElement("div");
       groupLine.className = "reveal-line";
       groupLine.style.color = group.color;
-      groupLine.textContent = group.emoji + " Group (primary): " + group.name;
+      groupLine.textContent = "Group (primary): " + group.name;
       revealPanel.appendChild(groupLine);
 
       if (type !== "group" && category) {
         const parentLine = document.createElement("div");
         parentLine.className = "reveal-line";
-        parentLine.textContent = (category.emoji ? category.emoji + " " : "") + "Secondary: " + category.name;
+        parentLine.textContent = "Secondary: " + category.name;
         revealPanel.appendChild(parentLine);
       }
 
@@ -1062,7 +1056,7 @@
           const chip = document.createElement("div");
           chip.className = "chip";
           chip.style.color = group.color;
-          chip.textContent = (cat.emoji ? cat.emoji + " " : "") + cat.name;
+          chip.textContent = cat.name;
           chipRow.appendChild(chip);
         });
         revealPanel.appendChild(chipRow);
@@ -1082,7 +1076,7 @@
       let emojiForLine = null;
 
       const fraction = elapsedSec / intervalSeconds;
-      if (fraction >= EMOJI_START_FRACTION && showEmojiForWord && emojiToggle.checked) {
+      if (fraction >= EMOJI_START_FRACTION && showEmojiForWord && false /* emoji disabled in v32 */) {
         const { group, category } = currentEntry;
         emojiForLine = (category && category.emoji) || group.emoji;
       }
@@ -1500,10 +1494,6 @@
     });
 
     wholeWordToggle.addEventListener("change", () => {
-      renderWordStage(lastStage, 0);
-    });
-
-    emojiToggle.addEventListener("change", () => {
       renderWordStage(lastStage, 0);
     });
 
