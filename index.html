@@ -1,9 +1,9 @@
-<!-- Emotional Generator v27 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v30 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v27 â€“ Mode 1</title>
+  <title>Emotional Generator v30 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -360,11 +360,11 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James - 07.12.2025 - v27
+      Jimmy James - 07.12.2025 - v30
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v27</h1>
+      <h1>Emotional Generator v30</h1>
       <div class="mode-label">Mode 1 - Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
@@ -523,8 +523,8 @@
           { name: "Mad", emoji: "ðŸ¤¬", children: ["Furious", "Jealous"] },
           { name: "Aggressive", emoji: "ðŸ—¯ï¸", children: ["Provoked", "Hostile"] },
           { name: "Frustrated", emoji: "ðŸ˜ ", children: ["Infuriated", "Annoyed"] },
-          { name: "Distant", emoji: "ðŸ§Š", children: ["Withdrawn", "Numb"] },
-          { name: "Critical", emoji: "ðŸ§", children: ["Sceptical", "Dismissive"] },
+          { name: "Distant", emoji: "ðŸ˜¶", children: ["Withdrawn", "Numb"] },
+          { name: "Critical", emoji: "ðŸ˜’", children: ["Sceptical", "Dismissive"] },
         ],
       },
       {
@@ -570,7 +570,7 @@
           { name: "Scared", emoji: "ðŸ˜±", children: ["Helpless", "Frightened"] },
           { name: "Anxious", emoji: "ðŸ˜Ÿ", children: ["Overwhelmed", "Worried"] },
           { name: "Insecure", emoji: "ðŸ˜¬", children: ["Inadequate", "Inferior"] },
-          { name: "Weak", emoji: "ðŸˆ¸", children: ["Worthless", "Insignificant"] },
+          { name: "Weak", emoji: "ðŸ˜ž", children: ["Worthless", "Insignificant"] },
           { name: "Rejected", emoji: "ðŸš«", children: ["Excluded", "Persecuted"] },
           { name: "Threatened", emoji: "âš ï¸", children: ["Nervous", "Exposed"] },
         ],
@@ -1345,7 +1345,11 @@
 
     wordTouchZone.addEventListener("click", () => {
       requestFullscreenIfNeeded();
-      nextWord();
+      if (isPaused) {
+        stepNextSyllableOrWord();
+      } else {
+        nextWord();
+      }
     });
 
     nextBtn.addEventListener("click", (e) => {
@@ -1558,4 +1562,3 @@
   </script>
 </body>
 </html>
-
