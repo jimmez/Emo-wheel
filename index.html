@@ -1,9 +1,9 @@
-<!-- Emotional Generator v22 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v27 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v22 â€“ Mode 1</title>
+  <title>Emotional Generator v27 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -114,7 +114,7 @@
     }
 
     .word-text {
-      font-size: clamp(2rem, 4vw, 2.7rem);
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -130,7 +130,9 @@
       font-style: italic;
       font-variant: normal;
       text-transform: lowercase;
-      font-family: "Comic Sans MS","Segoe Script","Brush Script MT",cursive;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      letter-spacing: 0.08em;
     }
 
     .status-row {
@@ -358,12 +360,12 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James - 07.12.2025 - v22
+      Jimmy James - 07.12.2025 - v27
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v22</h1>
-      <div class="mode-label">Mode 1 Â· Tap anywhere above the settings for a new word</div>
+      <h1>Emotional Generator v27</h1>
+      <div class="mode-label">Mode 1 - Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
         <div id="wordArea" class="word-display">
@@ -385,18 +387,18 @@
         </div>
 
         <div class="top-controls">
-          <button id="revealBtn" class="reveal-toggle">Reveal hierarchy â–¾</button>
+          <button id="revealBtn" class="reveal-toggle">Reveal hierarchy</button>
           <button id="phoneticBtn" class="phonetic-toggle">Phonetic: OFF</button>
           <button id="fullscreenBtn" class="phonetic-toggle">Fullscreen: OFF</button>
-          <button id="settingsToggleBtn" class="settings-toggle">Hide settings â¬‡</button>
+          <button id="settingsToggleBtn" class="settings-toggle">Hide settings</button>
         </div>
 
         <div id="revealPanel" class="reveal-panel"></div>
 
         <div class="nav-row">
-          <button id="prevBtn" class="nav-btn">Prev</button>
-          <button id="pauseBtn" class="nav-btn">Pause</button>
-          <button id="nextBtn" class="nav-btn">Next</button>
+          <button id="prevBtn" class="nav-btn">&lt; Prev</button>
+          <button id="pauseBtn" class="nav-btn">Pause ||</button>
+          <button id="nextBtn" class="nav-btn">Next &gt;</button>
         </div>
       </div>
     </div>
@@ -550,14 +552,14 @@
         ],
       },
       {
-        name: "BAD",
+        name: "BAD (low mood)",
         emoji: "ðŸ˜•",
         color: "#e11d48",
         categories: [
           { name: "Tired", emoji: "ðŸ˜´", children: ["Sleepy", "Unfocused"] },
-          { name: "Stressed", emoji: "ðŸ˜£", children: ["Overwhelmed", "Out of control"] },
-          { name: "Busy", emoji: "ðŸƒ", children: ["Rushed", "Pressured"] },
-          { name: "Bored", emoji: "ðŸ¥±", children: ["Indifferent", "Apathetic"] },
+          { name: "Stressed", emoji: "ðŸ˜«", children: ["Overwhelmed", "Out of control"] },
+          { name: "Busy", emoji: "ðŸ˜°", children: ["Rushed", "Pressured"] },
+          { name: "Bored", emoji: "ðŸ˜", children: ["Indifferent", "Apathetic"] },
         ],
       },
       {
@@ -931,7 +933,7 @@
     }
 
     function updatePauseButton() {
-      pauseBtn.textContent = isPaused ? "â–¶ï¸ Play" : "â¸ï¸ Pause";
+      pauseBtn.textContent = isPaused ? "Play >" : "Pause ||";
     }
 
     function updateFullscreenButton() {
@@ -1279,6 +1281,7 @@
       currentBaseWord = baseWord;
       currentParts = getSyllableParts(baseWord, phoneticMode);
       showEmojiForWord = Math.random() < EMOJI_PROBABILITY;
+      syllableVisibleCount = 1; // start each new word from first syllable/chunk
       renderStaticInfo();
       renderHierarchy();
       resetTimers();
@@ -1288,6 +1291,46 @@
       const idx = navOrder[navPos];
       currentIndex = idx;
       applyWord(ALL_WORDS[idx]);
+    }
+
+
+    function stepNextSyllableOrWord() {
+      const whole = wholeWordToggle.checked;
+      if (whole) {
+        nextWord();
+        pauseTimer();
+        return;
+      }
+      const totalParts = currentParts.length || 1;
+      if (syllableVisibleCount < totalParts) {
+        syllableVisibleCount++;
+        let stage = (syllableVisibleCount >= totalParts) ? 3 : (syllableVisibleCount >= 2 ? 2 : 1);
+        lastStage = stage;
+        const elapsedForEmoji = stage === 3 ? intervalSeconds * EMOJI_START_FRACTION : 0;
+        renderWordStage(stage, elapsedForEmoji);
+      } else {
+        nextWord();
+        pauseTimer();
+      }
+    }
+
+    function stepPrevSyllableOrWord() {
+      const whole = wholeWordToggle.checked;
+      if (whole) {
+        prevWord();
+        pauseTimer();
+        return;
+      }
+      if (syllableVisibleCount > 1) {
+        syllableVisibleCount--;
+        let stage = (syllableVisibleCount >= currentParts.length) ? 3 : (syllableVisibleCount >= 2 ? 2 : 1);
+        lastStage = stage;
+        const elapsedForEmoji = stage === 3 ? intervalSeconds * EMOJI_START_FRACTION : 0;
+        renderWordStage(stage, elapsedForEmoji);
+      } else {
+        prevWord();
+        pauseTimer();
+      }
     }
 
     function nextWord() {
@@ -1308,13 +1351,21 @@
     nextBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       requestFullscreenIfNeeded();
-      nextWord();
+      if (isPaused) {
+        stepNextSyllableOrWord();
+      } else {
+        nextWord();
+      }
     });
 
     prevBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       requestFullscreenIfNeeded();
-      prevWord();
+      if (isPaused) {
+        stepPrevSyllableOrWord();
+      } else {
+        prevWord();
+      }
     });
 
     pauseBtn.addEventListener("click", (e) => {
@@ -1331,12 +1382,12 @@
       const isOpen = revealPanel.style.display === "block";
       if (isOpen) {
         revealPanel.style.display = "none";
-        revealBtn.textContent = "Reveal hierarchy â–¾";
+        revealBtn.textContent = "Reveal hierarchy";
         resumeTimer();
       } else {
         renderHierarchy();
         revealPanel.style.display = "block";
-        revealBtn.textContent = "Hide hierarchy â–´";
+        revealBtn.textContent = "Hide hierarchy";
         pauseTimer();
       }
     });
@@ -1346,10 +1397,10 @@
       const isHidden = settingsPanel.classList.contains("hidden");
       if (isHidden) {
         settingsPanel.classList.remove("hidden");
-        settingsToggleBtn.textContent = "Hide settings â¬‡";
+        settingsToggleBtn.textContent = "Hide settings";
       } else {
         settingsPanel.classList.add("hidden");
-        settingsToggleBtn.textContent = "Show settings â¬†";
+        settingsToggleBtn.textContent = "Show settings";
       }
     });
 
@@ -1465,12 +1516,38 @@
     });
 
 
-    // Keyboard controls for PC: Space or Enter -> next word
+    // Keyboard controls for PC:
+    // Space: toggle pause/play
+    // Enter: next word (regardless of pause state)
+    // ArrowRight: in pause -> next syllable (then next word), in play -> next word
+    // ArrowLeft:  in pause -> previous syllable (or previous word), in play -> previous word
     document.addEventListener("keydown", (e) => {
-      if (e.code === "Space" || e.code === "Enter") {
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (isPaused) {
+          resumeTimer();
+        } else {
+          pauseTimer();
+        }
+      } else if (e.code === "Enter") {
         e.preventDefault();
         nextWord();
+      } else if (e.code === "ArrowRight") {
+        e.preventDefault();
+        if (isPaused) {
+          stepNextSyllableOrWord();
+        } else {
+          nextWord();
+        }
+      } else if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        if (isPaused) {
+          stepPrevSyllableOrWord();
+        } else {
+          prevWord();
+        }
       }
+      updatePauseButton();
     });
 
     updateSettingsVisibility();
