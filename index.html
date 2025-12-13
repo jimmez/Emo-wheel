@@ -1,9 +1,9 @@
-<!-- Emotional Generator v40 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v43 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v40 â€“ Mode 1</title>
+  <title>Emotional Generator v43 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -379,11 +379,11 @@
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James - 07.12.2025 - v40
+      Jimmy James - 07.12.2025 - v43
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v40</h1>
+      <h1>Emotional Generator v43</h1>
       <div class="mode-label">Mode 1 - Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
@@ -602,6 +602,19 @@
     ];
 
     // phonetic override / heuristic
+    
+    const GENZ_MAP = {
+      "GUILTY": "lowkey guilty",
+      "HAPPY": "vibing",
+      "ANGRY": "pressed",
+      "SAD": "down bad",
+      "CONFUSED": "lost fr",
+      "PROUD": "big flex",
+      "TIRED": "no energy",
+      "ANXIOUS": "stressin",
+    };
+
+
     const PHONETIC_OVERRIDES = {
       "CURIOUS": ["CU", "RI", "OUS"],
       "DETACHED": ["DE", "TACH", "ED"],
@@ -954,8 +967,8 @@
 
     let currentIndex = 0;
     let currentEntry = ALL_WORDS[0];
-    let currentParts = [];
     let currentBaseWord = "";
+    let currentParts = [];
     let showEmojiForWord = true;
     let phoneticMode = false;
 
@@ -1010,7 +1023,7 @@ function pushIntervalHistory(val) {
 }
 
 function triggerWordFlash() {
-  if (!flashOverlay) return;
+  if (!flashOverlay || (flashToggle && !flashToggle.checked)) return;
   flashOverlay.classList.remove("flash");
   void flashOverlay.offsetWidth;
   flashOverlay.classList.add("flash");
@@ -1494,7 +1507,9 @@ function speakWord(text) {
       renderStaticInfo();
       renderHierarchy();
       triggerWordFlash();
+      pushIntervalHistory(intervalSeconds);
       resetTimers();
+      progressBarEl.style.width = "100%";
     }
 
     function applyWordByNavPos() {
@@ -1631,7 +1646,9 @@ function speakWord(text) {
         intervalSeconds = 5;
         intervalInput.value = "5";
       }
+      pushIntervalHistory(intervalSeconds);
       resetTimers();
+      progressBarEl.style.width = "100%";
     }
 
     intervalInput.addEventListener("change", applyIntervalFromInput);
@@ -1681,14 +1698,14 @@ if (intervalHistorySelect) {
     });
 
     countdownToggle.addEventListener("change", () => {
-      renderIntervalHistory();
-    pushIntervalHistory(parseInt(intervalInput.value,10) || 30);
-    updateSettingsVisibility();
+      updateSettingsVisibility();
     });
 
     barToggle.addEventListener("change", () => {
       updateSettingsVisibility();
+      pushIntervalHistory(intervalSeconds);
       resetTimers();
+      progressBarEl.style.width = "100%";
     });
 
     syllableModeToggle.addEventListener("change", () => {
@@ -1727,8 +1744,6 @@ if (intervalHistorySelect) {
     });
 
     genZToggle.addEventListener("change", () => {
-      // Recompute base word & parts for current entry
-      updateGenZStyle();
       applyWord(currentEntry);
     });
 
