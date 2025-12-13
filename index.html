@@ -1,9 +1,9 @@
-<!-- Emotional Generator v32 - Jimmy James - 07.12.2025 -->
+<!-- Emotional Generator v40 - Jimmy James - 07.12.2025 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotional Generator v32 â€“ Mode 1</title>
+  <title>Emotional Generator v40 â€“ Mode 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -355,20 +355,40 @@
         min-height: 45vh;
       }
     }
-  </style>
+    #intervalHistorySelect { min-width: 90px; }
+
+  .word-display { position: relative; }
+  .flash-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.32);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .flash-overlay.flash { animation: flashPulse 180ms ease-out 0s 1; }
+  @keyframes flashPulse {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+      60% { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
+</style>
 </head>
 <body>
   <div class="app">
     <div class="watermark">
-      Jimmy James - 07.12.2025 - v32
+      Jimmy James - 07.12.2025 - v40
     </div>
 
     <div class="main-area" id="mainArea">
-      <h1>Emotional Generator v32</h1>
+      <h1>Emotional Generator v40</h1>
       <div class="mode-label">Mode 1 - Tap anywhere above the settings for a new word</div>
 
       <div class="word-touch-zone" id="wordTouchZone">
         <div id="wordArea" class="word-display">
+          <div id="flashOverlay" class="flash-overlay"></div>
           <div id="emoji" class="emoji"></div>
           <div id="wordText" class="word-text">â€¦</div>
         </div>
@@ -409,15 +429,23 @@
         <div class="settings-row">
           <label>
             Seconds / word:
-            <input id="intervalInput" type="number" min="1" step="1" value="5" />
+            <input id="intervalInput" type="number" min="1" step="1" value="30" />
+          </label>
+          <label>
+            Recent:
+            <select id="intervalHistorySelect"></select>
           </label>
           <label>
             Syllable speed (1â€“10):
-            <input id="syllableSpeedInput" type="number" min="1" max="10" step="1" value="5" />
+            <input id="syllableSpeedInput" type="number" min="1" max="10" step="1" value="7" />
           </label>
           <label>
             <input id="speakToggle" type="checkbox" />
             Speak word aloud
+          </label>
+          <label>
+            <input id="flashToggle" type="checkbox" checked />
+            Flash on word change
           </label>
         </div>
 
@@ -588,6 +616,138 @@
       "HELPLESS": ["help", "less"]
     };
 
+    const SYLLABLE_LINE_OVERRIDES = {
+      "GLAD": ["G", "LAD"],
+      "HAPPY": ["Hap", "py"],
+      "PLAYFUL": ["Play", "ful"],
+      "AROUSED": ["A", "roused"],
+      "CHEEKY": ["Chee", "ky"],
+      "CONTENT": ["Con", "tent"],
+      "FREE": ["Free"],
+      "JOYFUL": ["Joy", "ful"],
+      "INTERESTED": ["In", "te", "res", "ted"],
+      "CURIOUS": ["Cu", "ri", "ous"],
+      "INQUISITIVE": ["In", "qui", "sit", "ive"],
+      "PROUD": ["Proud"],
+      "SUCCESSFUL": ["Suc", "cess", "ful"],
+      "CONFIDENT": ["Con", "fi", "dent"],
+      "ACCEPTED": ["Ac", "cep", "ted"],
+      "RESPECTED": ["Re", "spec", "ted"],
+      "VALUED": ["Va", "lued"],
+      "POWERFUL": ["Pow", "er", "ful"],
+      "COURAGEOUS": ["Co", "u", "rag", "eous"],
+      "CREATIVE": ["Crea", "tive"],
+      "PEACEFUL": ["Pea", "ce", "ful"],
+      "LOVING": ["Lo", "ving"],
+      "THANKFUL": ["Th", "ank", "ful"],
+      "TRUSTING": ["Trus", "ting"],
+      "SENSITIVE": ["Sen", "si", "tive"],
+      "INTIMATE": ["In", "ti", "mate"],
+      "OPTIMISTIC": ["Opt", "i", "mist", "ic"],
+      "HOPEFUL": ["H", "ope", "ful"],
+      "INSPIRED": ["In", "spir", "ed"],
+      "SURPRISED": ["SUR", "PRISED"],
+      "STARTLED": ["Start", "led"],
+      "SHOCKED": ["Shock", "ed"],
+      "DISMAYED": ["Dis", "mayed"],
+      "CONFUSED": ["Con", "fused"],
+      "DISILLUSIONED": ["Dis", "illusi", "on", "ed"],
+      "PERPLEXED": ["Per", "plex", "ed"],
+      "AMAZED": ["Am", "azed"],
+      "ASTONISHED": ["As", "to", "nished"],
+      "AWE": ["Awe"],
+      "EXCITED": ["Ex", "cited"],
+      "EAGER": ["Ea", "ger"],
+      "ENERGETIC": ["En", "erge", "tic"],
+      "BAD": ["BAD"],
+      "ANGRY": ["An", "gry"],
+      "LET DOWN": ["Let", "down"],
+      "BETRAYED": ["Be", "tray", "ed"],
+      "RESENTFUL": ["Re", "sent", "ful"],
+      "HUMILIATED": ["Hu", "mi", "li", "a", "ted"],
+      "DISRESPECTED": ["Dis", "res", "pec", "ted"],
+      "RIDICULED": ["Ri", "di", "culed"],
+      "BITTER": ["Bi", "tter"],
+      "INDIGNANT": ["In", "dig", "nant"],
+      "VIOLATED": ["Vi", "ola", "ted"],
+      "MAD": ["Mad"],
+      "FURIOUS": ["Fu", "ri", "ous"],
+      "JEALOUS": ["Jeal", "ous"],
+      "AGGRESSIVE": ["Agg", "re", "ssive"],
+      "PROVOKED": ["Pro", "voked"],
+      "HOSTILE": ["Hos", "tile"],
+      "FRUSTRATED": ["Frus", "tra", "ted"],
+      "INFURIATED": ["In", "fur", "i", "ate", "ed"],
+      "ANNOYED": ["Ann", "oyed"],
+      "DISTANT": ["Dis", "t", "ant"],
+      "WITHDRAWN": ["With", "draw", "n"],
+      "NUMB": ["Numb"],
+      "CRITICAL": ["Cri", "tic", "al"],
+      "SCEPTICAL": ["Scep", "tic", "al"],
+      "DISMISSIVE": ["Dis", "miss", "ive"],
+      "DISGUSTED": ["DIS", "GUSTED"],
+      "DISAPPROVING": ["Dis", "ap", "proving"],
+      "JUDGMENTAL": ["Judg", "men", "tal"],
+      "EMBARRASSED": ["Em", "barr", "assed"],
+      "DISAPPOINTED": ["Dis", "a", "ppoin", "ted"],
+      "APPALLED": ["A", "ppalled"],
+      "REVOLTED": ["Re", "vol", "ted"],
+      "AWFUL": ["Aw", "ful"],
+      "NAUSEATED": ["Nau", "se", "a", "ted"],
+      "DETESTABLE": ["De", "tes", "table"],
+      "REPELLED": ["Re", "pelled"],
+      "HORRIFIED": ["Hor", "rified"],
+      "HESITANT": ["He", "si", "tant"],
+      "SAD": ["SAD"],
+      "LONELY": ["Lone", "ly"],
+      "ISOLATED": ["Iso", "la", "ted"],
+      "ABANDONED": ["Aban", "doned"],
+      "VULNERABLE": ["Vul", "nera", "ble"],
+      "VICTIMISED": ["Vic", "ti", "mised"],
+      "FRAGILE": ["Fra", "gile"],
+      "DESPAIR": ["Des", "pair"],
+      "GRIEF": ["Grief"],
+      "POWERLESS": ["Po", "wer", "less"],
+      "GUILTY": ["Gui", "lty"],
+      "REMORSEFUL": ["Re", "morse", "ful"],
+      "ASHAMED": ["A", "shamed"],
+      "DEPRESSED": ["De", "pressed"],
+      "EMPTY": ["Emp", "ty"],
+      "INFERIOR": ["In", "fe", "ri", "or"],
+      "HURT": ["Hurt"],
+      "TIRED": ["Ti", "red"],
+      "SLEEPY": ["Slee", "py"],
+      "UNFOCUSED": ["Un", "fo", "cused"],
+      "STRESSED": ["Stressed"],
+      "OVERWHELMED": ["O", "ver", "whelmed"],
+      "OUT OF CONTROL": ["Out", "of", "control"],
+      "BUSY": ["Bu", "sy"],
+      "RUSHED": ["Rushed"],
+      "PRESSURED": ["Pre", "ssured"],
+      "BORED": ["Bored"],
+      "INDIFFERENT": ["In", "dif", "fe", "rent"],
+      "APATHETIC": ["A", "pa", "the", "tic"],
+      "AFRAD": ["AF", "RAD"],
+      "FEARFUL": ["Fear", "ful"],
+      "SCARED": ["Scared"],
+      "HELPLESS": ["Help", "less"],
+      "FRIGHTENED": ["Frigh", "tened"],
+      "ANXIOUS": ["An", "xious"],
+      "WORRIED": ["Wo", "rried"],
+      "INSECURE": ["In", "se", "cure"],
+      "INADEQUATE": ["In", "a", "de", "quate"],
+      "WEAK": ["Weak"],
+      "WORTHLESS": ["Worth", "less"],
+      "INSIGNIFICANT": ["In", "sig", "ni", "fi", "cant"],
+      "REJECTED": ["Re", "jec", "ted"],
+      "EXCLUDED": ["Ex", "clu", "ded"],
+      "PERSECUTED": ["Per", "se", "cu", "ted"],
+      "THREATENED": ["Threa", "tened"],
+      "NERVOUS": ["Ner", "vous"],
+      "EXPOSED": ["Ex", "posed"]
+    };
+
+
     // Simple Gen Z slang mapping; fallback will add " (no cap)"
     function getGenZWord(base) {
       const upper = base.trim().toUpperCase();
@@ -756,6 +916,8 @@
     const wordTouchZone = document.getElementById("wordTouchZone");
     const emojiEl = document.getElementById("emoji");
     const wordTextEl = document.getElementById("wordText");
+    const flashOverlay = document.getElementById("flashOverlay");
+    const flashToggle = document.getElementById("flashToggle");
     const groupLabelEl = document.getElementById("groupLabel");
     const originalLabelEl = document.getElementById("originalLabel");
     const categoryLabelEl = document.getElementById("categoryLabel");
@@ -771,6 +933,7 @@
     const nextBtn = document.getElementById("nextBtn");
     const pauseBtn = document.getElementById("pauseBtn");
     const intervalInput = document.getElementById("intervalInput");
+    const intervalHistorySelect = document.getElementById("intervalHistorySelect");
     const syllableSpeedInput = document.getElementById("syllableSpeedInput");
     const speakToggle = document.getElementById("speakToggle");
     const countdownToggle = document.getElementById("countdownToggle");
@@ -796,7 +959,7 @@
     let showEmojiForWord = true;
     let phoneticMode = false;
 
-    let intervalSeconds = parseFloat(intervalInput.value) || 5;
+    let intervalSeconds = parseInt(intervalInput.value, 10) || 30;
     let syllableSpeedLevel = parseInt(syllableSpeedInput.value, 10) || 5;
     let syllableVisibleCount = 1;
     let timerHandle = null;
@@ -804,6 +967,54 @@
     let startTimestamp = null;
     let accumulatedMs = 0;
     let lastStage = 1;
+const SAFE_STORAGE_KEY = "emotionalGenerator.intervalHistory";
+function getSafeStorage() {
+  try { return window.localStorage; } catch { return null; }
+}
+function loadIntervalHistory() {
+  const st = getSafeStorage();
+  if (!st) return [];
+  try {
+    const raw = st.getItem(SAFE_STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter(n => Number.isInteger(n) && n >= 1) : [];
+  } catch { return []; }
+}
+function saveIntervalHistory(arr) {
+  const st = getSafeStorage();
+  if (!st) return;
+  try { st.setItem(SAFE_STORAGE_KEY, JSON.stringify(arr)); } catch {}
+}
+function renderIntervalHistory() {
+  if (!intervalHistorySelect) return;
+  const hist = loadIntervalHistory().slice(0, 10);
+  intervalHistorySelect.innerHTML = "";
+  const ph = document.createElement("option");
+  ph.value = "";
+  ph.textContent = "Pickâ€¦";
+  intervalHistorySelect.appendChild(ph);
+  hist.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = String(v);
+    opt.textContent = String(v) + " s";
+    intervalHistorySelect.appendChild(opt);
+  });
+}
+function pushIntervalHistory(val) {
+  const v = parseInt(val, 10);
+  if (!Number.isInteger(v) || v < 1) return;
+  const hist = loadIntervalHistory();
+  const next = [v, ...hist.filter(x => x !== v)].slice(0, 10);
+  saveIntervalHistory(next);
+  renderIntervalHistory();
+}
+
+function triggerWordFlash() {
+  if (!flashOverlay) return;
+  flashOverlay.classList.remove("flash");
+  void flashOverlay.offsetWidth;
+  flashOverlay.classList.add("flash");
+}
 
     function shuffleArray(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
@@ -888,27 +1099,31 @@
       return syllables;
     }
 
-    function getSyllableParts(word, usePhonetic) {
-      const trimmed = word.trim();
-      const upper = trimmed.toUpperCase();
+    
+function getSyllableParts(word, usePhonetic) {
+  const trimmed = (word || "").trim();
+  const upper = trimmed.toUpperCase();
 
-      // In Gen Z mode, split slang into word-like chunks (spaces, slashes, hyphens),
-      // so pieces feel like mini-words: e.g. "low-key curious" -> ["low", "key", "curious"]
-      if (genZToggle && genZToggle.checked) {
-        if (!trimmed) return [];
-        return trimmed.split(/[\s\/\-]+/);
-      }
+  if (SYLLABLE_LINE_OVERRIDES[upper]) {
+    return SYLLABLE_LINE_OVERRIDES[upper];
+  }
 
-      if (usePhonetic) return phoneticSplit(word);
-      if (PHONETIC_OVERRIDES[upper]) return PHONETIC_OVERRIDES[upper];
-      const len = trimmed.length;
-      if (len <= 3) return [trimmed];
-      const cut1 = Math.floor(len / 3);
-      const cut2 = Math.floor((len * 2) / 3);
-      return [trimmed.slice(0, cut1), trimmed.slice(cut1, cut2), trimmed.slice(cut2)];
-    }
+  if (genZToggle && genZToggle.checked) {
+    if (!trimmed) return [];
+    return trimmed.split(/[\s\/\-]+/).filter(Boolean);
+  }
 
-    function speakWord(text) {
+  if (usePhonetic) return phoneticSplit(word);
+  if (PHONETIC_OVERRIDES[upper]) return PHONETIC_OVERRIDES[upper];
+
+  const len = trimmed.length;
+  if (len <= 3) return [trimmed];
+  const cut1 = Math.floor(len / 3);
+  const cut2 = Math.floor((len * 2) / 3);
+  return [trimmed.slice(0, cut1), trimmed.slice(cut1, cut2), trimmed.slice(cut2)];
+}
+
+function speakWord(text) {
       if (!("speechSynthesis" in window)) return;
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
@@ -1278,6 +1493,7 @@
       syllableVisibleCount = 1; // start each new word from first syllable/chunk
       renderStaticInfo();
       renderHierarchy();
+      triggerWordFlash();
       resetTimers();
     }
 
@@ -1427,6 +1643,17 @@
       }
     });
 
+if (intervalHistorySelect) {
+  intervalHistorySelect.addEventListener("change", () => {
+    const v = parseInt(intervalHistorySelect.value, 10);
+    if (Number.isInteger(v) && v >= 1) {
+      intervalInput.value = String(v);
+      applyIntervalFromInput();
+    }
+    intervalHistorySelect.value = "";
+  });
+}
+
     function applySyllableSpeedFromInput() {
       const val = parseInt(syllableSpeedInput.value, 10);
       if (!isNaN(val)) {
@@ -1454,7 +1681,9 @@
     });
 
     countdownToggle.addEventListener("change", () => {
-      updateSettingsVisibility();
+      renderIntervalHistory();
+    pushIntervalHistory(parseInt(intervalInput.value,10) || 30);
+    updateSettingsVisibility();
     });
 
     barToggle.addEventListener("change", () => {
